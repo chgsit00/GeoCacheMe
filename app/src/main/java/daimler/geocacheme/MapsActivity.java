@@ -1,10 +1,14 @@
 package daimler.geocacheme;
 
+import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -15,6 +19,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -26,7 +32,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static final String TAG = MapsActivity.class.getSimpleName();
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
     private LocationRequest mLocationRequest;
-
+    private LatLng latLng;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +51,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(10 * 1000)        // 10 seconds, in milliseconds
                 .setFastestInterval(1 * 1000); // 1 second, in milliseconds
+
+        ImageButton button= (ImageButton) findViewById(R.id.imageButton);
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                float zoomLevel = 16; //Max:21
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,zoomLevel));
+            }
+        });
     }
 
     /**
@@ -83,12 +97,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Log.d(TAG, location.toString());
         double currentLatitude = location.getLatitude();
         double currentLongitude = location.getLongitude();
-        LatLng latLng = new LatLng(currentLatitude, currentLongitude);
+        latLng = new LatLng(currentLatitude, currentLongitude);
         MarkerOptions options = new MarkerOptions()
                 .position(latLng)
-                .title("I am here!");
+                .title("I am here!")
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.testicon));
+
         mMap.addMarker(options);
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        float zoomLevel = 16; //Max:21
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel));
     }
 
     @Override
