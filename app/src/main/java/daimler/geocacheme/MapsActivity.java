@@ -53,6 +53,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .setFastestInterval(1 * 1000); // 1 second, in milliseconds
 
         ImageButton button= (ImageButton) findViewById(R.id.imageButton);
+        button.setImageResource(R.drawable.standort);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 float zoomLevel = 16; //Max:21
