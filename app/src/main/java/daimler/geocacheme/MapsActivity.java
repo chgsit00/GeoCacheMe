@@ -25,7 +25,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener, LocationListener{
+        GoogleApiClient.OnConnectionFailedListener, LocationListener
+{
 
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
@@ -33,8 +34,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
     private LocationRequest mLocationRequest;
     private LatLng latLng;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -52,12 +55,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .setInterval(10 * 1000)        // 10 seconds, in milliseconds
                 .setFastestInterval(1 * 1000); // 1 second, in milliseconds
 
-        ImageButton button= (ImageButton) findViewById(R.id.imageButton);
+        ImageButton button = (ImageButton) findViewById(R.id.imageButton);
         button.setImageResource(R.drawable.standort);
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                float zoomLevel = 16; //Max:21
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,zoomLevel));
+        button.setOnClickListener(new View.OnClickListener()
+        {
+            public void onClick(View v)
+            {
+                if (latLng != null)
+                {
+                    float zoomLevel = 16; //Max:21
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel));
+                }
+                else
+                {
+                    //TODO: Exception werfen und in Activity fangen
+                    //throw new GPSNotActiveException;
+                }
             }
         });
     }
@@ -72,7 +85,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * installed Google Play services and returned to the app.
      */
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(GoogleMap googleMap)
+    {
         mMap = googleMap;
 
         // Add a marker in Sydney and move the camera
@@ -86,15 +100,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     {
         Log.i(TAG, "Location services connected.");
         Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        if (location == null) {
+        if (location == null)
+        {
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         }
-        else {
+        else
+        {
             handleNewLocation(location);
-        };
+        }
+        ;
     }
 
-    private void handleNewLocation(Location location) {
+    private void handleNewLocation(Location location)
+    {
         Log.d(TAG, location.toString());
         double currentLatitude = location.getLatitude();
         double currentLongitude = location.getLongitude();
@@ -116,31 +134,40 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
-    protected void onResume() {
+    protected void onResume()
+    {
         super.onResume();
         //setUpMapIfNeeded();
         mGoogleApiClient.connect();
     }
 
     @Override
-    protected void onPause() {
+    protected void onPause()
+    {
         super.onPause();
-        if (mGoogleApiClient.isConnected()) {
+        if (mGoogleApiClient.isConnected())
+        {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
             mGoogleApiClient.disconnect();
         }
     }
 
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        if (connectionResult.hasResolution()) {
-            try {
+    public void onConnectionFailed(ConnectionResult connectionResult)
+    {
+        if (connectionResult.hasResolution())
+        {
+            try
+            {
                 // Start an Activity that tries to resolve the error
                 connectionResult.startResolutionForResult(this, CONNECTION_FAILURE_RESOLUTION_REQUEST);
-            } catch (IntentSender.SendIntentException e) {
+            } catch (IntentSender.SendIntentException e)
+            {
                 e.printStackTrace();
             }
-        } else {
+        }
+        else
+        {
             Log.i(TAG, "Location services connection failed with code " + connectionResult.getErrorCode());
         }
     }
