@@ -1,20 +1,11 @@
 package daimler.geocacheme;
 
-import android.content.Intent;
 import android.content.IntentSender;
-import android.graphics.Point;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationManager;
-import android.os.Handler;
-import android.os.SystemClock;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.Interpolator;
-import android.view.animation.LinearInterpolator;
-import android.widget.Button;
 import android.widget.ImageButton;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -25,12 +16,9 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
@@ -50,20 +38,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        mMap.setMyLocationEnabled(true);
         SupportMapFragment fragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mMap = fragment.getMap();
         mMap.setMyLocationEnabled(true);
-        LocationManager manager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-        String provider = manager.getBestProvider(criteria, true);
-
+      //  LocationManager manager = (LocationManager) getSystemService(LOCATION_SERVICE);
+      //  Criteria criteria = new Criteria();
 
         //TODO: Testen
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-    //   SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-    //           .findFragmentById(R.id.map);
      //  mapFragment.getMapAsync(this);
+
        mGoogleApiClient = new GoogleApiClient.Builder(this)
                .addConnectionCallbacks(this)
                .addOnConnectionFailedListener(this)
@@ -72,8 +56,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
        // Create the LocationRequest object
        mLocationRequest = LocationRequest.create()
                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-               .setInterval(1 * 1000)        // 10 seconds, in milliseconds
-               .setFastestInterval(1 * 1000); // 1 second, in milliseconds
+               .setInterval(1 * 1000)        // 1 seconds, in milliseconds
+               .setFastestInterval(1 * 500); // 0,5 second, in milliseconds
 
         ImageButton button = (ImageButton) findViewById(R.id.imageButton);
         button.setImageResource(R.drawable.standort);
@@ -126,7 +110,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         {
             handleNewLocation(location);
         }
-        ;
     }
 
     private void handleNewLocation(Location location)
@@ -149,7 +132,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onResume()
     {
         super.onResume();
-        //setUpMapIfNeeded();
         mGoogleApiClient.connect();
     }
 
