@@ -22,6 +22,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
@@ -34,6 +35,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
     private LocationRequest mLocationRequest;
     private LatLng latLng;
+    private Marker marker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -52,8 +54,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Create the LocationRequest object
         mLocationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setInterval(10 * 1000)        // 10 seconds, in milliseconds
+                .setInterval(1 * 1000)        // 10 seconds, in milliseconds
                 .setFastestInterval(1 * 1000); // 1 second, in milliseconds
+
+        marker = mMap.addMarker(new MarkerOptions()
+                .position(latLng)
+                .title("I am here!")
+                .snippet("My Snippet")
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.auto48)));
 
         ImageButton button = (ImageButton) findViewById(R.id.imageButton);
         button.setImageResource(R.drawable.standort);
@@ -65,8 +73,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 {
                     float zoomLevel = 16; //Max:21
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel));
-                }
-                else
+                } else
                 {
                     //TODO: Exception werfen und in Activity fangen
                     //throw new GPSNotActiveException;
@@ -103,8 +110,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (location == null)
         {
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-        }
-        else
+        } else
         {
             handleNewLocation(location);
         }
@@ -116,14 +122,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Log.d(TAG, location.toString());
         double currentLatitude = location.getLatitude();
         double currentLongitude = location.getLongitude();
+     //   if(marker!=null){
+     //       marker.remove();
+     //   }
         latLng = new LatLng(currentLatitude, currentLongitude);
-        MarkerOptions options = new MarkerOptions()
-                .position(latLng)
-                .title("I am here!")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.auto48));
-
-        mMap.addMarker(options);
-        float zoomLevel = 16; //Max:21
+        marker.setPosition(latLng);
+        //mMap.addMarker(options);
+        float zoomLevel = 17; //Max:21
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel));
     }
 
@@ -165,8 +170,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             {
                 e.printStackTrace();
             }
-        }
-        else
+        } else
         {
             Log.i(TAG, "Location services connection failed with code " + connectionResult.getErrorCode());
         }
