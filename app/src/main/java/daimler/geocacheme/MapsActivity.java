@@ -2,11 +2,16 @@ package daimler.geocacheme;
 
 import android.content.Intent;
 import android.content.IntentSender;
+import android.graphics.Point;
 import android.location.Location;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Interpolator;
+import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.ImageButton;
 
@@ -18,6 +23,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -35,7 +41,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
     private LocationRequest mLocationRequest;
     private LatLng latLng;
-    private Marker marker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -56,12 +61,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(1 * 1000)        // 10 seconds, in milliseconds
                 .setFastestInterval(1 * 1000); // 1 second, in milliseconds
-
-        marker = mMap.addMarker(new MarkerOptions()
-                .position(latLng)
-                .title("I am here!")
-                .snippet("My Snippet")
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.auto48)));
 
         ImageButton button = (ImageButton) findViewById(R.id.imageButton);
         button.setImageResource(R.drawable.standort);
@@ -122,11 +121,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Log.d(TAG, location.toString());
         double currentLatitude = location.getLatitude();
         double currentLongitude = location.getLongitude();
-     //   if(marker!=null){
-     //       marker.remove();
-     //   }
         latLng = new LatLng(currentLatitude, currentLongitude);
-        marker.setPosition(latLng);
+        Marker marker = mMap.addMarker(new MarkerOptions()
+                .position(latLng)
+                .title("I am here!")
+                .snippet("My Snippet")
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.auto48)));
+        animateMarker(marker, latLng, false);
         //mMap.addMarker(options);
         float zoomLevel = 17; //Max:21
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel));
@@ -180,5 +181,50 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onLocationChanged(Location location)
     {
         handleNewLocation(location);
+    }
+
+    public void animateMarker(final Marker marker, final LatLng toPosition,
+                              final boolean hideMarker) {
+        final Handler handler = new Handler();
+        final long start = SystemClock.uptimeMillis();
+        Projection proj = mMap.getProjection();
+        Point startPoint = proj.toScreenLocation(marker.getPosition());
+        final LatLng startLatLng = proj.fromScreenLocation(startPoint);
+        final long duration = 500;
+
+        final Interpolator interpolator = new LinearInterpolator();
+
+        handler.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                long elapsed = SystemClock.uptimeMillis() - start;
+                float t = interpolator.getInterpolation((float) elapsed
+                        / duration);
+                double lng = t * toPosition.longitude + (1 - t)
+                        * startLatLng.longitude;
+                double lat = t * toPosition.latitude + (1 - t)
+                        * startLatLng.latitude;
+                marker.setPosition(new LatLng(lat, lng));
+
+                if (t < 1.0)
+                {
+                    // Post again 16ms later.
+                    handler.postDelayed(this, 16);
+                }
+                else
+                {
+                    if (hideMarker)
+                    {
+                        marker.setVisible(false);
+                    }
+                    else
+                    {
+                        marker.setVisible(true);
+                    }
+                }
+            }
+        });
     }
 }
