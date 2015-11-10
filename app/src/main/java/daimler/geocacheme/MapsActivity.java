@@ -3,7 +3,9 @@ package daimler.geocacheme;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.graphics.Point;
+import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.support.v4.app.FragmentActivity;
@@ -47,20 +49,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        mMap.setMyLocationEnabled(true);
+        SupportMapFragment fragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mMap = fragment.getMap();
+        mMap.setMyLocationEnabled(true);
+        LocationManager manager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        String provider = manager.getBestProvider(criteria, true);
+
+
+        //TODO: Testen
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-        // Create the LocationRequest object
-        mLocationRequest = LocationRequest.create()
-                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setInterval(1 * 1000)        // 10 seconds, in milliseconds
-                .setFastestInterval(1 * 1000); // 1 second, in milliseconds
+    //   SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+    //           .findFragmentById(R.id.map);
+     //  mapFragment.getMapAsync(this);
+       mGoogleApiClient = new GoogleApiClient.Builder(this)
+               .addConnectionCallbacks(this)
+               .addOnConnectionFailedListener(this)
+               .addApi(LocationServices.API)
+               .build();
+       // Create the LocationRequest object
+       mLocationRequest = LocationRequest.create()
+               .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+               .setInterval(1 * 1000)        // 10 seconds, in milliseconds
+               .setFastestInterval(1 * 1000); // 1 second, in milliseconds
 
         ImageButton button = (ImageButton) findViewById(R.id.imageButton);
         button.setImageResource(R.drawable.standort);
