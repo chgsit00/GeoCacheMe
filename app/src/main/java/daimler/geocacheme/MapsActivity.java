@@ -67,26 +67,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                .setInterval(1 * 1000)        // 1 seconds, in milliseconds
                .setFastestInterval(1 * 500); // 0,5 second, in milliseconds
 
-        ImageButton button = (ImageButton) findViewById(R.id.imageButton);
-        button.setImageResource(R.drawable.standort);
-        button.setOnClickListener(new View.OnClickListener()
-        {
-            public void onClick(View v)
-            {
-                if (latLng != null)
-                {
-                    float zoomLevel = 16; //Max:21
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel));
-                } else
-                {
-                    //TODO: Exception werfen und in Activity fangen
-                    //throw new GPSNotActiveException;
-                }
-            }
-        });
-
-        Button btn_find = (Button) findViewById(R.id.btn_find);
-
+        ImageButton btn_find = (ImageButton) findViewById(R.id.btn_find);
+        btn_find.setImageResource(R.drawable.suche);
         // Defining button click event listener for the find button
         View.OnClickListener findClickListener = new View.OnClickListener() {
             @Override
