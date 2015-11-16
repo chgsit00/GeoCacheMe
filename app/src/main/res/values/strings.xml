@@ -3,4 +3,8 @@
     <string name="title_activity_maps">GeoCacheMe!</string>
     <string name="str_btn_find">Find</string>
     <string name="hnt_et_location">Enter location</string>
+
+    <string name="title_activity_fullscreen">FullscreenActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 </resources>
