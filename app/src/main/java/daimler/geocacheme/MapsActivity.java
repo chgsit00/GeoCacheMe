@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -29,6 +28,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
+
+import daimler.geocacheme.GeoCacheLogic.GeoCache;
+import daimler.geocacheme.GeoCacheLogic.GeoCacheProvider;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener
@@ -40,46 +43,52 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LocationRequest mLocationRequest;
     private LatLng latLng;
     MarkerOptions markerOptions;
+    GeoCacheProvider provider;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        provider = new GeoCacheProvider();
 
         SupportMapFragment fragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mMap = fragment.getMap();
         mMap.setMyLocationEnabled(true);
-      //  LocationManager manager = (LocationManager) getSystemService(LOCATION_SERVICE);
-      //  Criteria criteria = new Criteria();
+        //  LocationManager manager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        //  Criteria criteria = new Criteria();
 
         //TODO: Testen
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-     //  mapFragment.getMapAsync(this);
+        //  mapFragment.getMapAsync(this);
 
-       mGoogleApiClient = new GoogleApiClient.Builder(this)
-               .addConnectionCallbacks(this)
-               .addOnConnectionFailedListener(this)
-               .addApi(LocationServices.API)
-               .build();
-       // Create the LocationRequest object
-       mLocationRequest = LocationRequest.create()
-               .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-               .setInterval(1 * 1000)        // 1 seconds, in milliseconds
-               .setFastestInterval(1 * 500); // 0,5 second, in milliseconds
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+        // Create the LocationRequest object
+        mLocationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setInterval(1 * 1000)        // 1 seconds, in milliseconds
+                .setFastestInterval(1 * 500); // 0,5 second, in milliseconds
 
         ImageButton btn_find = (ImageButton) findViewById(R.id.btn_find);
         btn_find.setImageResource(R.drawable.suche);
         // Defining button click event listener for the find button
-        View.OnClickListener findClickListener = new View.OnClickListener() {
+        View.OnClickListener findClickListener = new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
                 // Getting reference to EditText to get the user input location
                 EditText etLocation = (EditText) findViewById(R.id.et_location);
 
                 // Getting user input location
                 String location = etLocation.getText().toString();
 
-                if(location!=null && !location.equals("")){
+                if (location != null && !location.equals(""))
+                {
                     new GeocoderTask().execute(location);
                 }
             }
@@ -87,6 +96,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Setting button click event listener for the find button
         btn_find.setOnClickListener(findClickListener);
+
+
+        //TODO: Noch statisch zum Testen
+
+        String id = UUID.randomUUID().toString();
+        provider.CreateGeoCache("Berlin", id, 52.520007, 13.404953999999975);
+
+        id = UUID.randomUUID().toString();
+        provider.CreateGeoCache("Hochschule Esslingen", id, 48.7453375, 9.322090099999969);
+
+        id = UUID.randomUUID().toString();
+        provider.CreateGeoCache("Mensa Hochschule Esslingen", id, 48.74438725435462, 9.32416534420554);
+
+        PlaceGeoCacheMarkers();
     }
 
     /**
@@ -117,7 +140,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (location == null)
         {
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-        } else
+        }
+        else
         {
             handleNewLocation(location);
         }
@@ -170,7 +194,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             {
                 e.printStackTrace();
             }
-        } else
+        }
+        else
         {
             Log.i(TAG, "Location services connection failed with code " + connectionResult.getErrorCode());
         }
@@ -182,28 +207,46 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         handleNewLocation(location);
     }
 
+    public void PlaceGeoCacheMarkers()
+    {
+        List<GeoCache> geoCacheList = provider.GetGeoCacheList();
+        for (GeoCache geoCache : geoCacheList)
+        {
+            LatLng markerLatLng = new LatLng(geoCache.Latitude, geoCache.Longitude);
+            String geoCacheName = geoCache.Name;
+            MarkerOptions options = new MarkerOptions();
+            options.position(markerLatLng).icon(BitmapDescriptorFactory.fromResource(R.drawable.testicon)).title(geoCacheName);
+            mMap.addMarker(options);
+        }
+    }
+
     private class GeocoderTask extends AsyncTask<String, Void, List<Address>>
     {
 
         @Override
-        protected List<Address> doInBackground(String... locationName) {
+        protected List<Address> doInBackground(String... locationName)
+        {
             // Creating an instance of Geocoder class
             Geocoder geocoder = new Geocoder(getBaseContext());
             List<Address> addresses = null;
 
-            try {
+            try
+            {
                 // Getting a maximum of 3 Address that matches the input text
                 addresses = geocoder.getFromLocationName(locationName[0], 3);
-            } catch (IOException e) {
+            } catch (IOException e)
+            {
                 e.printStackTrace();
             }
             return addresses;
         }
 
         @Override
-        protected void onPostExecute(List<Address> addresses) {
+        protected void onPostExecute(List<Address> addresses)
+        {
 
-            if(addresses==null || addresses.size()==0){
+            if (addresses == null || addresses.size() == 0)
+            {
                 Toast.makeText(getBaseContext(), "No Location found", Toast.LENGTH_SHORT).show();
             }
 
@@ -211,7 +254,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.clear();
 
             // Adding Markers on Google Map for each matching address
-            for(int i=0;i<addresses.size();i++){
+            for (int i = 0; i < addresses.size(); i++)
+            {
 
                 Address address = (Address) addresses.get(i);
 
@@ -229,7 +273,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mMap.addMarker(markerOptions);
 
                 // Locate the first location
-                if(i==0)
+                if (i == 0)
                     mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
             }
         }
