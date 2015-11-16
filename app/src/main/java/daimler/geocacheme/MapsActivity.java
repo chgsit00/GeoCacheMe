@@ -44,6 +44,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LatLng latLng;
     MarkerOptions markerOptions;
     GeoCacheProvider provider;
+    public InternetConnectionTester internetTester;
+    public boolean internetCheck = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -51,6 +53,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         provider = new GeoCacheProvider();
+        internetTester = new InternetConnectionTester();
 
         SupportMapFragment fragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mMap = fragment.getMap();
@@ -87,7 +90,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 // Getting user input location
                 String location = etLocation.getText().toString();
 
-                if (location != null && !location.equals(""))
+                Thread t = new Thread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        internetCheck = internetTester.hasActiveInternetConnection(MapsActivity.this);
+                    }
+                });
+                t.start();
+                if (location != null && !location.equals("") && internetCheck)
                 {
                     new GeocoderTask().execute(location);
                 }
@@ -125,11 +137,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap)
     {
         mMap = googleMap;
-
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.testicon)).position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
     @Override
