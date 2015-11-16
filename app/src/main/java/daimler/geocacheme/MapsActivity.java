@@ -74,7 +74,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .setFastestInterval(1 * 500); // 0,5 second, in milliseconds
 
         ImageButton btn_find = (ImageButton) findViewById(R.id.btn_find);
-        btn_find.setImageResource(R.drawable.suche);
+        btn_find.setImageResource(R.drawable.suuche);
         // Defining button click event listener for the find button
         View.OnClickListener findClickListener = new View.OnClickListener()
         {
@@ -256,7 +256,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // Adding Markers on Google Map for each matching address
             for (int i = 0; i < addresses.size(); i++)
             {
-
                 Address address = (Address) addresses.get(i);
 
                 // Creating an instance of GeoPoint, to display in Google Map
@@ -271,7 +270,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 markerOptions.title(addressText);
 
                 mMap.addMarker(markerOptions);
-
+                PlaceGeoCacheMarkers();
                 // Locate the first location
                 if (i == 0)
                     mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
