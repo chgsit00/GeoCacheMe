@@ -1,11 +1,7 @@
 package daimler.geocacheme.GeoCacheLogic;
 
-import android.app.Activity;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import daimler.geocacheme.MapsActivity;
 
 /**
  * Created by CGsch on 16.11.2015.
