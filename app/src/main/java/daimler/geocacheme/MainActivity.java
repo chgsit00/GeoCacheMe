@@ -3,6 +3,7 @@ package daimler.geocacheme;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -10,10 +11,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.TextView;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.List;
+import java.util.UUID;
+
+import daimler.geocacheme.GeoCacheLogic.GeoCache;
+import daimler.geocacheme.UserManagement.User;
 
 public class MainActivity extends AppCompatActivity
 {
+    SharedPreferences userPrefs;
+    SharedPreferences.Editor prefsEditor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -30,7 +43,7 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View v)
             {
                 // Getting reference to EditText to get the user input location
-            startActivity(new Intent(MainActivity.this, MapsActivity.class));
+                startActivity(new Intent(MainActivity.this, MapsActivity.class));
             }
         };
 
@@ -57,7 +70,36 @@ public class MainActivity extends AppCompatActivity
             public void onClick(DialogInterface dialog, int which)
             {
                 String input = userInput.getText().toString();
+                String id = UUID.randomUUID().toString();
+                User user = new User(input, id);
+                saveUserIntoPrefs(user);
             }
         });
+        if (getUserFromPrefs() == null)
+        {
+            builder.show();
+        }
+
+    }
+
+    public void saveUserIntoPrefs(User user)
+    {
+        userPrefs = getPreferences(MODE_PRIVATE);
+        prefsEditor = userPrefs.edit();
+        Gson gson = new Gson();
+        String jsonUser = gson.toJson(user); // myObject - instance of MyObject
+        prefsEditor.putString("UserObject", jsonUser);
+        prefsEditor.apply();
+    }
+
+    public User getUserFromPrefs()
+    {
+        userPrefs = getPreferences(MODE_PRIVATE);
+        Gson gson = new Gson();
+        String jsonUser = userPrefs.getString("UserObject", "");
+        Type type = new TypeToken<User>()
+        {
+        }.getType();
+        return gson.fromJson(jsonUser, type);
     }
 }
