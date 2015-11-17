@@ -1,6 +1,7 @@
 package daimler.geocacheme;
 
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -25,8 +26,11 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,6 +50,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     GeoCacheProvider provider;
     public InternetConnectionTester internetTester;
     public boolean internetCheck = false;
+    SharedPreferences geoCachePrefs;
+    SharedPreferences.Editor prefsEditor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -121,7 +127,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         id = UUID.randomUUID().toString();
         provider.CreateGeoCache("Mensa Hochschule Esslingen", id, 48.74438725435462, 9.32416534420554);
 
+        saveGeoCacheListIntoPrefs();
+        getGeoCacheListFromPrefs();
+
         PlaceGeoCacheMarkers();
+    }
+
+    public void saveGeoCacheListIntoPrefs()
+    {
+        geoCachePrefs = getPreferences(MODE_PRIVATE);
+        prefsEditor = geoCachePrefs.edit();
+        Gson gson = new Gson();
+        String jsonGeoCaches = gson.toJson(provider.GeoCacheList); // myObject - instance of MyObject
+        prefsEditor.putString("GeoCacheObject", jsonGeoCaches);
+        prefsEditor.apply();
+    }
+
+    public void getGeoCacheListFromPrefs()
+    {
+        geoCachePrefs = getPreferences(MODE_PRIVATE);
+        Gson gson = new Gson();
+        String jsonGeoCaches = geoCachePrefs.getString("GeoCacheObject", "");
+        Type type = new TypeToken<List<GeoCache>>()
+        {
+        }.getType();
+        provider.GeoCacheList = gson.fromJson(jsonGeoCaches, type);
     }
 
     /**
@@ -147,8 +177,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (location == null)
         {
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-        }
-        else
+        } else
         {
             handleNewLocation(location);
         }
@@ -201,8 +230,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             {
                 e.printStackTrace();
             }
-        }
-        else
+        } else
         {
             Log.i(TAG, "Location services connection failed with code " + connectionResult.getErrorCode());
         }

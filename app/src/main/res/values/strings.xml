@@ -3,6 +3,4 @@
     <string name="title_activity_maps">GeoCacheMe!</string>
     <string name="str_btn_find">Find</string>
     <string name="hnt_et_location">Enter location</string>
-    <string name="title_activity_main">MainActivity</string>
-    <string name="MapButtonText">ButtonLayout</string>
 </resources>

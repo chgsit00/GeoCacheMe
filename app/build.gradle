@@ -27,5 +27,4 @@ dependencies {
     compile 'com.google.android.gms:play-services-ads:8.1.0'
     compile 'com.google.android.gms:play-services-identity:8.1.0'
     compile 'com.google.android.gms:play-services-gcm:8.1.0'
-    compile 'com.android.support:design:23.1.0'
 }
