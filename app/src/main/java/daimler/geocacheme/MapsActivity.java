@@ -7,6 +7,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
@@ -25,12 +26,14 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -52,6 +55,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public boolean internetCheck = false;
     SharedPreferences geoCachePrefs;
     SharedPreferences.Editor prefsEditor;
+    public Handler handler = new Handler();
+    public List<Marker> Markers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -61,6 +66,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         provider = new GeoCacheProvider();
         internetTester = new InternetConnectionTester();
 
+        Markers = new ArrayList<Marker>();
         SupportMapFragment fragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mMap = fragment.getMap();
         mMap.setMyLocationEnabled(true);
@@ -131,6 +137,62 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         getGeoCacheListFromPrefs();
 
         PlaceGeoCacheMarkers();
+
+
+    }
+
+    public Runnable DistanceCalculator = new Runnable()
+    {
+        double distance = 40;
+        double currentLatitude = 0;
+        double currentLongitude = 0;
+        Location currentLocation;
+
+        @Override
+        public void run()
+        {
+            for (GeoCache geoCache : provider.GeoCacheList)
+            {
+                currentLocation = mMap.getMyLocation();
+
+                if (currentLocation != null)
+                {
+                    currentLatitude = currentLocation.getLatitude();
+                    currentLongitude = currentLocation.getLongitude();
+                    distance = distFrom(currentLatitude, currentLongitude, geoCache.Latitude, geoCache.Longitude);
+                    if (distance < 100 && geoCache.MarkerID != null)
+                    {
+                        setMarkerAsVisited(geoCache.MarkerID);
+                    }
+                }
+            }
+            handler.postDelayed(DistanceCalculator, 1000);
+        }
+    };
+
+    public static double distFrom(double lat1, double lng1, double lat2, double lng2)
+    {
+        double earthRadius = 6371000; //meters
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLng = Math.toRadians(lng2 - lng1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                        Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double dist = (earthRadius * c);
+
+        return dist;
+    }
+
+    public void setMarkerAsVisited(String geoCacheID)
+    {
+        for (Marker marker : Markers)
+        {
+            if (marker.getId().equals(geoCacheID))
+            {
+                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.logobesucht48));
+            }
+        }
     }
 
     public void saveGeoCacheListIntoPrefs()
@@ -203,6 +265,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onResume()
     {
         super.onResume();
+        DistanceCalculator.run();
         mGoogleApiClient.connect();
     }
 
@@ -210,6 +273,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onPause()
     {
         super.onPause();
+        handler.removeCallbacks(DistanceCalculator);
         if (mGoogleApiClient.isConnected())
         {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
@@ -251,7 +315,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             String geoCacheName = geoCache.Name;
             MarkerOptions options = new MarkerOptions();
             options.position(markerLatLng).icon(BitmapDescriptorFactory.fromResource(R.drawable.testicon)).title(geoCacheName);
-            mMap.addMarker(options);
+            Marker marker = mMap.addMarker(options);
+            geoCache.MarkerID = marker.getId();
+            Markers.add(marker);
         }
     }
 

@@ -9,4 +9,5 @@ public class GeoCache
     public String Name;
     public double Latitude;
     public double Longitude;
+    public String MarkerID;
 }
