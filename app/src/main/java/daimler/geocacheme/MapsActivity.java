@@ -53,8 +53,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     GeoCacheProvider provider;
     public InternetConnectionTester internetTester;
     public boolean internetCheck = false;
-    SharedPreferences geoCachePrefs;
-    SharedPreferences.Editor prefsEditor;
     public Handler handler = new Handler();
     public List<Marker> Markers;
 
@@ -63,19 +61,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        provider = new GeoCacheProvider();
+        provider = new GeoCacheProvider(this);
         internetTester = new InternetConnectionTester();
 
         Markers = new ArrayList<Marker>();
         SupportMapFragment fragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mMap = fragment.getMap();
         mMap.setMyLocationEnabled(true);
-        //  LocationManager manager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        //  Criteria criteria = new Criteria();
-
-        //TODO: Testen
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        //  mapFragment.getMapAsync(this);
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -124,21 +116,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //TODO: Noch statisch zum Testen
 
-        String id = UUID.randomUUID().toString();
-        provider.CreateGeoCache("Berlin", id, 52.520007, 13.404953999999975);
+       String id = UUID.randomUUID().toString();
+       provider.CreateGeoCache("Berlin", id, 52.520007, 13.404953999999975);
 
-        id = UUID.randomUUID().toString();
-        provider.CreateGeoCache("Hochschule Esslingen", id, 48.7453375, 9.322090099999969);
+       id = UUID.randomUUID().toString();
+       provider.CreateGeoCache("Hochschule Esslingen", id, 48.7453375, 9.322090099999969);
 
-        id = UUID.randomUUID().toString();
-        provider.CreateGeoCache("Mensa Hochschule Esslingen", id, 48.74438725435462, 9.32416534420554);
+       id = UUID.randomUUID().toString();
+       provider.CreateGeoCache("Mensa Hochschule Esslingen", id, 48.74438725435462, 9.32416534420554);
 
-        saveGeoCacheListIntoPrefs();
-        getGeoCacheListFromPrefs();
+       provider.saveGeoCacheListIntoPrefs(this);
+     //  provider.getGeoCacheListFromPrefs(this);
 
         PlaceGeoCacheMarkers();
-
-
     }
 
     public Runnable DistanceCalculator = new Runnable()
@@ -195,36 +185,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    public void saveGeoCacheListIntoPrefs()
-    {
-        geoCachePrefs = getPreferences(MODE_PRIVATE);
-        prefsEditor = geoCachePrefs.edit();
-        Gson gson = new Gson();
-        String jsonGeoCaches = gson.toJson(provider.GeoCacheList); // myObject - instance of MyObject
-        prefsEditor.putString("GeoCacheObject", jsonGeoCaches);
-        prefsEditor.apply();
-    }
-
-    public void getGeoCacheListFromPrefs()
-    {
-        geoCachePrefs = getPreferences(MODE_PRIVATE);
-        Gson gson = new Gson();
-        String jsonGeoCaches = geoCachePrefs.getString("GeoCacheObject", "");
-        Type type = new TypeToken<List<GeoCache>>()
-        {
-        }.getType();
-        provider.GeoCacheList = gson.fromJson(jsonGeoCaches, type);
-    }
-
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     @Override
     public void onMapReady(GoogleMap googleMap)
     {
