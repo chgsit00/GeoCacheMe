@@ -41,7 +41,7 @@ import daimler.geocacheme.GeoCacheLogic.GeoCache;
 import daimler.geocacheme.GeoCacheLogic.GeoCacheProvider;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener, LocationListener
+        GoogleApiClient.OnConnectionFailedListener, LocationListener, GoogleMap.OnMapLongClickListener
 {
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
@@ -129,6 +129,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      //  provider.getGeoCacheListFromPrefs(this);
 
         PlaceGeoCacheMarkers();
+
+        mMap.setOnMapLongClickListener(this);
     }
 
     public Runnable DistanceCalculator = new Runnable()
@@ -212,7 +214,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         double currentLongitude = location.getLongitude();
         latLng = new LatLng(currentLatitude, currentLongitude);
         float zoomLevel = 17; //Max:21
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel));
+        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomLevel));
     }
 
     @Override
@@ -279,6 +281,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             geoCache.MarkerID = marker.getId();
             Markers.add(marker);
         }
+    }
+
+    @Override
+    public void onMapLongClick(LatLng point) {
+        //TODO: Eingabefenster für Benutzer starten
+        String name = "Neuer GeoCache";
+
+        Marker marker = mMap.addMarker(new MarkerOptions()
+                .position(point)
+                .title(name)
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.testicon)));
+
+        String id = UUID.randomUUID().toString();
+        provider.CreateGeoCache(name, id, point.latitude, point.longitude, marker.getId());
+        provider.saveGeoCacheListIntoPrefs(this);
     }
 
     private class GeocoderTask extends AsyncTask<String, Void, List<Address>>

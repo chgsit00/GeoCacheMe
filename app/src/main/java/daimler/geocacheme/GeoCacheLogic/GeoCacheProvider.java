@@ -41,6 +41,17 @@ public class GeoCacheProvider
         GeoCacheList.add(geoCache);
     }
 
+    public void CreateGeoCache(String name, String iD, double latitude, double longitude, String markerID)
+    {
+        GeoCache geoCache = new GeoCache();
+        geoCache.Id = iD;
+        geoCache.Name = name;
+        geoCache.Latitude = latitude;
+        geoCache.Longitude = longitude;
+        geoCache.MarkerID = markerID;
+        GeoCacheList.add(geoCache);
+    }
+
     public List<GeoCache> GetGeoCacheList()
     {
         return GeoCacheList;
