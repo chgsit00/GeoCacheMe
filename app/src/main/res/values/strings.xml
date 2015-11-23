@@ -9,4 +9,6 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="title_activity_main">GeoCacheMe!</string>
     <string name="MapButtonText">ButtonLayout</string>
+    <string name="geocachetitle">Please enter a name for your GeoCache</string>
+    <string name="usernametitle">Please enter your Username</string>
 </resources>

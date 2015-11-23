@@ -1,7 +1,8 @@
 package daimler.geocacheme;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.IntentSender;
-import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -10,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -28,11 +30,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -286,8 +285,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapLongClick(LatLng point) {
         //TODO: Eingabefenster für Benutzer starten
-        String name = "Neuer GeoCache";
+        View view = (LayoutInflater.from(MapsActivity.this)).inflate(R.layout.geocache_dialog, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
+        builder.setView(view);
+        final EditText geoCacheInput = (EditText) view.findViewById(R.id.geocachenameinput);
+        final LatLng location = point;
 
+        builder.setCancelable(true).setPositiveButton("Ok", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                String input = geoCacheInput.getText().toString();
+                CreateNewGeoCache(location, input);
+            }
+        });
+        builder.show();
+    }
+
+    private void CreateNewGeoCache(LatLng point, String name)
+    {
         Marker marker = mMap.addMarker(new MarkerOptions()
                 .position(point)
                 .title(name)
