@@ -29,9 +29,9 @@
             android:layout_width="232dp"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
+            android:layout_weight="0.77"
             android:hint="@string/hnt_et_location"
             android:inputType="text"
-            android:layout_weight="0.77"
             />
 
         <ImageButton
@@ -39,8 +39,10 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_gravity="right"
-            android:text="@string/str_btn_find"
             android:layout_marginLeft="30dp"
-            android:src="@drawable/suuche" />
+            android:background="@null"
+            android:scaleType="fitCenter"
+            android:src="@drawable/suche"
+            android:text="@string/str_btn_find"/>
     </LinearLayout>
 </LinearLayout>

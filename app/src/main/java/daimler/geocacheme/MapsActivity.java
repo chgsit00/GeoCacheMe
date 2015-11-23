@@ -81,7 +81,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .setFastestInterval(1 * 500); // 0,5 second, in milliseconds
 
         ImageButton btn_find = (ImageButton) findViewById(R.id.btn_find);
-        btn_find.setImageResource(R.drawable.suuche);
+        btn_find.setImageResource(R.drawable.suche);
         // Defining button click event listener for the find button
         View.OnClickListener findClickListener = new View.OnClickListener()
         {
@@ -182,7 +182,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         {
             if (marker.getId().equals(geoCacheID))
             {
-                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.logobesucht48));
+                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.gruen_logo_72));
             }
         }
     }
@@ -276,7 +276,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             LatLng markerLatLng = new LatLng(geoCache.Latitude, geoCache.Longitude);
             String geoCacheName = geoCache.Name;
             MarkerOptions options = new MarkerOptions();
-            options.position(markerLatLng).icon(BitmapDescriptorFactory.fromResource(R.drawable.testicon)).title(geoCacheName);
+            options.position(markerLatLng).icon(BitmapDescriptorFactory.fromResource(R.drawable.blau_logo_72)).title(geoCacheName);
             Marker marker = mMap.addMarker(options);
             geoCache.MarkerID = marker.getId();
             Markers.add(marker);
@@ -291,7 +291,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Marker marker = mMap.addMarker(new MarkerOptions()
                 .position(point)
                 .title(name)
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.testicon)));
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.blau_logo_72)));
 
         String id = UUID.randomUUID().toString();
         provider.CreateGeoCache(name, id, point.latitude, point.longitude, marker.getId());

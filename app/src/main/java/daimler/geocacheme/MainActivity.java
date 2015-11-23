@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         ImageButton mapButton = (ImageButton) findViewById(R.id.mapbutton);
-
+        mapButton.setImageResource(R.drawable.map);
         View.OnClickListener findClickListener = new View.OnClickListener()
         {
             @Override
@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity
 
         ImageButton optionsButton = (ImageButton) findViewById(R.id.optionsbutton);
 
-        optionsButton.setImageResource(R.drawable.optionsmenue);
+        optionsButton.setImageResource(R.drawable.optionsmenu);
 
         View view = (LayoutInflater.from(MainActivity.this)).inflate(R.layout.user_dialog, null);
 
