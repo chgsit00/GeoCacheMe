@@ -292,7 +292,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .position(point)
                 .title(name)
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.blau_logo_72)));
-
+        Markers.add(marker);
         String id = UUID.randomUUID().toString();
         provider.CreateGeoCache(name, id, point.latitude, point.longitude, marker.getId());
         provider.saveGeoCacheListIntoPrefs(this);
