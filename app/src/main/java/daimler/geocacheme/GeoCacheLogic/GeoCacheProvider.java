@@ -2,6 +2,7 @@ package daimler.geocacheme.GeoCacheLogic;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -23,7 +24,11 @@ public class GeoCacheProvider
 
     public GeoCacheProvider(Context context)
     {
-        getGeoCacheListFromPrefs(context);
+        GeoCacheList = getGeoCacheListFromPrefs(context);
+        if (GeoCacheList == null)
+        {
+            GeoCacheList = new ArrayList<GeoCache>();
+        }
     }
 
     public void CreateGeoCache(String name, String iD, double latitude, double longitude)
@@ -51,7 +56,7 @@ public class GeoCacheProvider
         prefsEditor.apply();
     }
 
-    public void getGeoCacheListFromPrefs(Context context)
+    public List<GeoCache> getGeoCacheListFromPrefs(Context context)
     {
         geoCachePrefs = context.getSharedPreferences("GeoCacheObject", Context.MODE_PRIVATE);
         Gson gson = new Gson();
@@ -59,6 +64,6 @@ public class GeoCacheProvider
         Type type = new TypeToken<List<GeoCache>>()
         {
         }.getType();
-        GeoCacheList = gson.fromJson(jsonGeoCaches, type);
+        return gson.fromJson(jsonGeoCaches, type);
     }
 }
