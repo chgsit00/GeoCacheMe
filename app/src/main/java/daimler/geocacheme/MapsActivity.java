@@ -26,6 +26,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -40,7 +41,8 @@ import daimler.geocacheme.GeoCacheLogic.GeoCache;
 import daimler.geocacheme.GeoCacheLogic.GeoCacheProvider;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener, LocationListener, GoogleMap.OnMapLongClickListener
+        GoogleApiClient.OnConnectionFailedListener, LocationListener, GoogleMap.OnMapLongClickListener,
+        GoogleMap.OnMyLocationChangeListener
 {
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
@@ -54,6 +56,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public boolean internetCheck = false;
     public Handler handler = new Handler();
     public List<Marker> Markers;
+    private Marker myLocationMarker;
+    private static BitmapDescriptor markerIconBitmapDescriptor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -67,6 +71,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment fragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mMap = fragment.getMap();
         mMap.setMyLocationEnabled(true);
+        mMap.setOnMyLocationChangeListener(this);
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -112,20 +117,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Setting button click event listener for the find button
         btn_find.setOnClickListener(findClickListener);
 
+        // Load custom marker icon
+        markerIconBitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.auto48);
 
         //TODO: Noch statisch zum Testen
 
-       String id = UUID.randomUUID().toString();
-       provider.CreateGeoCache("Berlin", id, 52.520007, 13.404953999999975);
+        String id = UUID.randomUUID().toString();
+        provider.CreateGeoCache("Berlin", id, 52.520007, 13.404953999999975);
 
-       id = UUID.randomUUID().toString();
-       provider.CreateGeoCache("Hochschule Esslingen", id, 48.7453375, 9.322090099999969);
+        id = UUID.randomUUID().toString();
+        provider.CreateGeoCache("Hochschule Esslingen", id, 48.7453375, 9.322090099999969);
 
-       id = UUID.randomUUID().toString();
-       provider.CreateGeoCache("Mensa Hochschule Esslingen", id, 48.74438725435462, 9.32416534420554);
+        id = UUID.randomUUID().toString();
+        provider.CreateGeoCache("Mensa Hochschule Esslingen", id, 48.74438725435462, 9.32416534420554);
 
-       provider.saveGeoCacheListIntoPrefs(this);
-     //  provider.getGeoCacheListFromPrefs(this);
+        provider.saveGeoCacheListIntoPrefs(this);
+        //  provider.getGeoCacheListFromPrefs(this);
 
         PlaceGeoCacheMarkers();
 
@@ -283,7 +290,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void onMapLongClick(LatLng point) {
+    public void onMapLongClick(LatLng point)
+    {
         //TODO: Eingabefenster für Benutzer starten
         View view = (LayoutInflater.from(MapsActivity.this)).inflate(R.layout.geocache_dialog, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
@@ -313,6 +321,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         String id = UUID.randomUUID().toString();
         provider.CreateGeoCache(name, id, point.latitude, point.longitude, marker.getId());
         provider.saveGeoCacheListIntoPrefs(this);
+    }
+
+    @Override
+    public void onMyLocationChange(Location location)
+    {
+        // Remove the old marker object
+        if (myLocationMarker != null)
+        {
+            myLocationMarker.remove();
+        }
+
+        // Add a new marker object at the new (My Location dot) location
+        myLocationMarker = mMap.addMarker(new MarkerOptions()
+                .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                .icon(markerIconBitmapDescriptor));
     }
 
     private class GeocoderTask extends AsyncTask<String, Void, List<Address>>
