@@ -38,6 +38,7 @@ public class GeoCacheProvider
         geoCache.Name = name;
         geoCache.Latitude = latitude;
         geoCache.Longitude = longitude;
+        geoCache.visited = false;
         GeoCacheList.add(geoCache);
     }
 
@@ -49,6 +50,7 @@ public class GeoCacheProvider
         geoCache.Latitude = latitude;
         geoCache.Longitude = longitude;
         geoCache.MarkerID = markerID;
+        geoCache.visited = false;
         GeoCacheList.add(geoCache);
     }
 
