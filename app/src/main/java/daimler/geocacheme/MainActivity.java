@@ -53,6 +53,17 @@ public class MainActivity extends AppCompatActivity
 
         userButton.setImageResource(R.drawable.user);
 
+        View.OnClickListener findClickListener2 = new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                // Getting reference to EditText to get the user input location
+                startActivity(new Intent(MainActivity.this, UserManagementActivity.class));
+            }
+        };
+        userButton.setOnClickListener(findClickListener2);
+
         ImageButton optionsButton = (ImageButton) findViewById(R.id.optionsbutton);
 
         optionsButton.setImageResource(R.drawable.optionsmenu);

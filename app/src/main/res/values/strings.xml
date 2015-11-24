@@ -11,4 +11,6 @@
     <string name="MapButtonText">ButtonLayout</string>
     <string name="geocachetitle">Please enter a name for your GeoCache</string>
     <string name="usernametitle">Please enter your Username</string>
+    <string name="title_activity_user_management">UserManagementActivity</string>
+    <string name="usernametext">Name</string>
 </resources>
