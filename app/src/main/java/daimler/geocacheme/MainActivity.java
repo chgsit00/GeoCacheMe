@@ -22,12 +22,10 @@ import java.util.UUID;
 
 import daimler.geocacheme.GeoCacheLogic.GeoCache;
 import daimler.geocacheme.UserManagement.User;
+import daimler.geocacheme.UserManagement.UserManagement;
 
 public class MainActivity extends AppCompatActivity
 {
-    SharedPreferences userPrefs;
-    SharedPreferences.Editor prefsEditor;
-
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -65,7 +63,7 @@ public class MainActivity extends AppCompatActivity
         builder.setView(view);
         final EditText userInput = (EditText) view.findViewById(R.id.userinput);
 
-        builder.setCancelable(true).setPositiveButton("Ok", new DialogInterface.OnClickListener()
+        builder.setCancelable(false).setPositiveButton("Ok", new DialogInterface.OnClickListener()
         {
             @Override
             public void onClick(DialogInterface dialog, int which)
@@ -73,34 +71,15 @@ public class MainActivity extends AppCompatActivity
                 String input = userInput.getText().toString();
                 String id = UUID.randomUUID().toString();
                 User user = new User(input, id);
-                saveUserIntoPrefs(user);
+                UserManagement.saveUserIntoPrefs(user, MainActivity.this);
             }
         });
-        if (getUserFromPrefs() == null)
+        if (UserManagement.getUserFromPrefs(MainActivity.this) == null)
         {
             builder.show();
         }
 
     }
 
-    public void saveUserIntoPrefs(User user)
-    {
-        userPrefs = getPreferences(MODE_PRIVATE);
-        prefsEditor = userPrefs.edit();
-        Gson gson = new Gson();
-        String jsonUser = gson.toJson(user); // myObject - instance of MyObject
-        prefsEditor.putString("UserObject", jsonUser);
-        prefsEditor.apply();
-    }
 
-    public User getUserFromPrefs()
-    {
-        userPrefs = getPreferences(MODE_PRIVATE);
-        Gson gson = new Gson();
-        String jsonUser = userPrefs.getString("UserObject", "");
-        Type type = new TypeToken<User>()
-        {
-        }.getType();
-        return gson.fromJson(jsonUser, type);
-    }
 }
