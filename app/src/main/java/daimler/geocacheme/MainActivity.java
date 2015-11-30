@@ -3,7 +3,6 @@ package daimler.geocacheme;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -12,15 +11,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
-import com.google.android.gms.maps.model.LatLng;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
-import java.util.List;
 import java.util.UUID;
 
-import daimler.geocacheme.GeoCacheLogic.GeoCache;
+import daimler.geocacheme.GeoCacheLogic.GeoCacheProvider;
 import daimler.geocacheme.UserManagement.User;
 import daimler.geocacheme.UserManagement.UserManagement;
 
@@ -30,6 +23,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        GeoCacheProvider.SetGeoCacheListfromPrefs(MainActivity.this);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

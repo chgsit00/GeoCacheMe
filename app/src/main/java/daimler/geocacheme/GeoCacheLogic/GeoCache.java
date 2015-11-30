@@ -10,5 +10,5 @@ public class GeoCache
     public double Latitude;
     public double Longitude;
     public String MarkerID;
-    public boolean visited = false;
+    public boolean Currentlyvisited = false;
 }

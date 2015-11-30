@@ -2,7 +2,6 @@ package daimler.geocacheme.GeoCacheLogic;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -11,18 +10,16 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import daimler.geocacheme.MapsActivity;
-
 /**
  * Created by CGsch on 16.11.2015.
  */
 public class GeoCacheProvider
 {
-    public List<GeoCache> GeoCacheList;
-    SharedPreferences geoCachePrefs;
-    SharedPreferences.Editor prefsEditor;
+    public static List<GeoCache> GeoCacheList = new ArrayList<GeoCache>();
+    static SharedPreferences geoCachePrefs;
+    static SharedPreferences.Editor prefsEditor;
 
-    public GeoCacheProvider(Context context)
+    public static void SetGeoCacheListfromPrefs(Context context)
     {
         GeoCacheList = getGeoCacheListFromPrefs(context);
         if (GeoCacheList == null)
@@ -31,18 +28,18 @@ public class GeoCacheProvider
         }
     }
 
-    public void CreateGeoCache(String name, String iD, double latitude, double longitude)
+    public static void CreateGeoCache(String name, String iD, double latitude, double longitude)
     {
         GeoCache geoCache = new GeoCache();
         geoCache.Id = iD;
         geoCache.Name = name;
         geoCache.Latitude = latitude;
         geoCache.Longitude = longitude;
-        geoCache.visited = false;
+        geoCache.Currentlyvisited = false;
         GeoCacheList.add(geoCache);
     }
 
-    public void CreateGeoCache(String name, String iD, double latitude, double longitude, String markerID)
+    public static void CreateGeoCache(String name, String iD, double latitude, double longitude, String markerID)
     {
         GeoCache geoCache = new GeoCache();
         geoCache.Id = iD;
@@ -50,16 +47,16 @@ public class GeoCacheProvider
         geoCache.Latitude = latitude;
         geoCache.Longitude = longitude;
         geoCache.MarkerID = markerID;
-        geoCache.visited = false;
+        geoCache.Currentlyvisited = false;
         GeoCacheList.add(geoCache);
     }
 
-    public List<GeoCache> GetGeoCacheList()
+    public static List<GeoCache> GetGeoCacheList()
     {
         return GeoCacheList;
     }
 
-    public void saveGeoCacheListIntoPrefs(Context context)
+    public static void saveGeoCacheListIntoPrefs(Context context)
     {
         geoCachePrefs = context.getSharedPreferences("GeoCacheObject", Context.MODE_PRIVATE);
         prefsEditor = geoCachePrefs.edit();
@@ -69,7 +66,7 @@ public class GeoCacheProvider
         prefsEditor.apply();
     }
 
-    public List<GeoCache> getGeoCacheListFromPrefs(Context context)
+    public static List<GeoCache> getGeoCacheListFromPrefs(Context context)
     {
         geoCachePrefs = context.getSharedPreferences("GeoCacheObject", Context.MODE_PRIVATE);
         Gson gson = new Gson();
