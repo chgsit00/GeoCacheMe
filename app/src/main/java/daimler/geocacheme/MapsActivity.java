@@ -327,7 +327,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         GeoCacheProvider.CreateGeoCache(name, id, point.latitude, point.longitude, marker.getId());
         GeoCacheProvider.saveGeoCacheListIntoPrefs(this);
         //TODO: Das hier ist nur ein Test
-        new SaveGeoCache().execute();
+        SaveGeoCache saveGeoCache = new SaveGeoCache();
+        saveGeoCache.GeoCacheID = id;
+        saveGeoCache.GeoCacheName = name;
+        saveGeoCache.GeoCacheLatitude = point.latitude;
+        saveGeoCache.GeoCacheLongitude = point.longitude;
+        saveGeoCache.execute();
     }
 
     @Override
@@ -437,7 +442,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             params.add(new BasicNameValuePair("name", name));
             params.add(new BasicNameValuePair("id", id));
             params.add(new BasicNameValuePair("gpsLatitude", ""+gpsLatitude));
-            params.add(new BasicNameValuePair("gpsLongitude", ""+gpsLongitude));
+            params.add(new BasicNameValuePair("gpsLongitude", "" + gpsLongitude));
 
             // getting JSON Object
             // Note that create product url accepts POST method
