@@ -14,15 +14,19 @@ import android.widget.ImageButton;
 import java.util.UUID;
 
 import daimler.geocacheme.GeoCacheLogic.GeoCacheProvider;
+import daimler.geocacheme.Server.GeoCacheServerProvider;
 import daimler.geocacheme.UserManagement.User;
 import daimler.geocacheme.UserManagement.UserManagement;
 
 public class MainActivity extends AppCompatActivity
 {
+    GeoCacheServerProvider geoCacheServerProvider;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        geoCacheServerProvider = new GeoCacheServerProvider();
+
         GeoCacheProvider.SetGeoCacheListfromPrefs(MainActivity.this);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

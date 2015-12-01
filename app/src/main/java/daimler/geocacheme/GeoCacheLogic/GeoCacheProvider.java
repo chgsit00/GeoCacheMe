@@ -76,4 +76,16 @@ public class GeoCacheProvider
         }.getType();
         return gson.fromJson(jsonGeoCaches, type);
     }
+
+    public static boolean GeoCacheAlreadyExists(String id)
+    {
+        boolean s = false;
+        for (GeoCache geoCache : GeoCacheList)
+        {
+            if (geoCache.Id == id){
+                s = true;
+            }
+        }
+        return s;
+    }
 }
