@@ -35,12 +35,11 @@ public class GeoCacheServerProvider
     // geoCaches JSONArray
     JSONArray geoCaches = null;
 
-    public GeoCacheServerProvider()
+    public void StartGeoCacheServerProvider()
     {
         // Loading geoCaches in Background Thread
         new LoadAllGeoCaches().execute();
     }
-
     /**
      * Background Async Task to Load all product by making HTTP Request
      */

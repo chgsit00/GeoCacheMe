@@ -32,11 +32,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,13 +39,13 @@ import java.util.UUID;
 
 import daimler.geocacheme.GeoCacheLogic.GeoCache;
 import daimler.geocacheme.GeoCacheLogic.GeoCacheProvider;
-import daimler.geocacheme.Server.JSONParser;
+import daimler.geocacheme.InternetConnection.InternetConnectionTester;
+import daimler.geocacheme.Server.SaveGeoCache;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener, GoogleMap.OnMapLongClickListener,
         GoogleMap.OnMyLocationChangeListener
 {
-    private static String url_create_geocache = "http://geocacheme.bplaced.net/create_geoCache.php";
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
     public static final String TAG = MapsActivity.class.getSimpleName();
@@ -327,12 +322,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         GeoCacheProvider.CreateGeoCache(name, id, point.latitude, point.longitude, marker.getId());
         GeoCacheProvider.saveGeoCacheListIntoPrefs(this);
         //TODO: Das hier ist nur ein Test
-        SaveGeoCache saveGeoCache = new SaveGeoCache();
+        final SaveGeoCache saveGeoCache = new SaveGeoCache();
         saveGeoCache.GeoCacheID = id;
         saveGeoCache.GeoCacheName = name;
         saveGeoCache.GeoCacheLatitude = point.latitude;
         saveGeoCache.GeoCacheLongitude = point.longitude;
-        saveGeoCache.execute();
+        Thread t = new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                internetCheck = internetTester.hasActiveInternetConnection(MapsActivity.this);
+                if (internetCheck)
+                {
+                    saveGeoCache.StartSaveGeoCache();
+                }
+            }
+        });
+        t.start();
     }
 
     @Override
@@ -405,75 +412,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if (i == 0)
                     mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
             }
-        }
-    }
-
-    class SaveGeoCache extends AsyncTask<String, String, String>
-    {
-        // url to create new product
-
-        JSONParser jsonParser = new JSONParser();
-        // JSON Node names
-        private static final String TAG_SUCCESS = "success";
-
-        public String GeoCacheName;
-        public String GeoCacheID;
-        public double GeoCacheLatitude;
-        public double GeoCacheLongitude;
-        /**
-         * Before starting background thread Show Progress Dialog
-         * */
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        /**
-         * Creating product
-         * */
-        protected String doInBackground(String... args) {
-            String name = GeoCacheName;
-            String id = GeoCacheID;
-            double gpsLatitude = GeoCacheLatitude;
-            double gpsLongitude = GeoCacheLongitude;
-
-            // Building Parameters
-            List<NameValuePair> params = new ArrayList<NameValuePair>();
-            params.add(new BasicNameValuePair("name", name));
-            params.add(new BasicNameValuePair("id", id));
-            params.add(new BasicNameValuePair("gpsLatitude", ""+gpsLatitude));
-            params.add(new BasicNameValuePair("gpsLongitude", "" + gpsLongitude));
-
-            // getting JSON Object
-            // Note that create product url accepts POST method
-            JSONObject json = jsonParser.makeHttpRequest(url_create_geocache,
-                    "POST", params);
-
-            // check log cat fro response
-            Log.d("Create Response", json.toString());
-
-            // check for success tag
-            try {
-                int success = json.getInt(TAG_SUCCESS);
-
-                if (success == 1) {
-                    // successfully created product
-
-                } else {
-                    // failed to create product
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        /**
-         * After completing background task Dismiss the progress dialog
-         * **/
-        protected void onPostExecute(String file_url) {
-            // dismiss the dialog once done
         }
     }
 }

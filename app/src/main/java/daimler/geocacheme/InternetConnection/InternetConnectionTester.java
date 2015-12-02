@@ -1,4 +1,4 @@
-package daimler.geocacheme;
+package daimler.geocacheme.InternetConnection;
 
 import android.app.Activity;
 import android.content.Context;

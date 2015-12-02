@@ -3,17 +3,20 @@ package daimler.geocacheme;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
 import java.util.UUID;
-
+import android.os.Handler;
 import daimler.geocacheme.GeoCacheLogic.GeoCacheProvider;
+import daimler.geocacheme.InternetConnection.InternetConnectionTester;
 import daimler.geocacheme.Server.GeoCacheServerProvider;
 import daimler.geocacheme.UserManagement.User;
 import daimler.geocacheme.UserManagement.UserManagement;
@@ -21,12 +24,17 @@ import daimler.geocacheme.UserManagement.UserManagement;
 public class MainActivity extends AppCompatActivity
 {
     GeoCacheServerProvider geoCacheServerProvider;
+    InternetConnectionTester internetConnectionTester;
+    boolean internetCheck = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         geoCacheServerProvider = new GeoCacheServerProvider();
-
+        internetConnectionTester = new InternetConnectionTester();
+        Thread t = new Thread(GeoCacheServerProviderRunnable);
+        t.start();
         GeoCacheProvider.SetGeoCacheListfromPrefs(MainActivity.this);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -87,8 +95,38 @@ public class MainActivity extends AppCompatActivity
         {
             builder.show();
         }
-
     }
 
+    class CheckInternetConnectionTask extends AsyncTask<String, Void, String>
+    {
+        @Override
+        protected String doInBackground(String... params) {
+            try{
+                if(internetConnectionTester.hasActiveInternetConnection(MainActivity.this)){
+                    internetCheck = true;
+                }
+                else internetCheck = false;
+                return "1";
+            }catch (Exception e){
+                Log.i("Internet Connection", "Connection failed");
+            }
+            return "0";
+        }
+    }
+
+    public Runnable GeoCacheServerProviderRunnable = new Runnable()
+    {
+        public Handler handler = new Handler();
+        @Override
+        public void run()
+        {
+            new CheckInternetConnectionTask().execute();
+            if (internetCheck)
+            {
+                geoCacheServerProvider.StartGeoCacheServerProvider();
+            }
+            else handler.postDelayed(GeoCacheServerProviderRunnable, 1000);
+        }
+    };
 
 }
