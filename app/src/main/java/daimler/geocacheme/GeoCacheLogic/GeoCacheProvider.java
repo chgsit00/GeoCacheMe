@@ -21,7 +21,7 @@ public class GeoCacheProvider
 
     public static void SetGeoCacheListfromPrefs(Context context)
     {
-        GeoCacheList = getGeoCacheListFromPrefs(context);
+       // GeoCacheList = getGeoCacheListFromPrefs(context);
         if (GeoCacheList == null)
         {
             GeoCacheList = new ArrayList<GeoCache>();
@@ -77,12 +77,18 @@ public class GeoCacheProvider
         return gson.fromJson(jsonGeoCaches, type);
     }
 
+    public static void SaveNewGeoCachesIntoPrefs(Context context)
+    {
+
+    }
+
     public static boolean GeoCacheAlreadyExists(String id)
     {
         boolean s = false;
         for (GeoCache geoCache : GeoCacheList)
         {
-            if (geoCache.Id == id){
+            if (geoCache.Id == id)
+            {
                 s = true;
             }
         }

@@ -131,12 +131,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         id = UUID.randomUUID().toString();
         GeoCacheProvider.CreateGeoCache("Mensa Hochschule Esslingen", id, 48.74438725435462, 9.32416534420554);
 
-        GeoCacheProvider.saveGeoCacheListIntoPrefs(this);
+    //    GeoCacheProvider.saveGeoCacheListIntoPrefs(this);
         //  geoCacheServerProvider.getGeoCacheListFromPrefs(this);
 
         PlaceGeoCacheMarkers();
 
         mMap.setOnMapLongClickListener(this);
+
+        MarkerAdder.run();
+    }
+
+    public Runnable MarkerAdder = new Runnable()
+    {
+        @Override
+        public void run()
+        {
+            for (GeoCache geoCache : GeoCacheProvider.GeoCacheList)
+            {
+                if (geoCache.MarkerID == null)
+                {
+                    PlaceMarkerforNewGeoCache(geoCache);
+                }
+            }
+            handler.postDelayed(MarkerAdder, 1000);
+        }
+    };
+
+    public void PlaceMarkerforNewGeoCache(GeoCache geoCache)
+    {
+        geoCache.Currentlyvisited = false;
+        LatLng markerLatLng = new LatLng(geoCache.Latitude, geoCache.Longitude);
+        String geoCacheName = geoCache.Name;
+        MarkerOptions options = new MarkerOptions();
+        options.position(markerLatLng).icon(BitmapDescriptorFactory.fromResource(R.drawable.blau_logo_72)).title(geoCacheName);
+        Marker marker = mMap.addMarker(options);
+        geoCache.MarkerID = marker.getId();
+        Markers.add(marker);
     }
 
     public Runnable DistanceCalculator = new Runnable()
@@ -149,7 +179,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         public void run()
         {
-            for (GeoCache geoCache : GeoCacheProvider.GeoCacheList)
+            for (GeoCache geoCache : GeoCacheProvider.GetGeoCacheList())
             {
                 currentLocation = mMap.getMyLocation();
 
@@ -186,7 +216,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     {
         for (Marker marker : Markers)
         {
-            if (marker.getId().equals(geoCacheID) && visited == false)
+            if (marker.getId().equals(geoCacheID) && !visited)
             {
                 marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.gruen_logo_72));
             }
@@ -207,7 +237,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (location == null)
         {
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-        } else
+        }
+        else
         {
             handleNewLocation(location);
         }
@@ -262,7 +293,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             {
                 e.printStackTrace();
             }
-        } else
+        }
+        else
         {
             Log.i(TAG, "Location services connection failed with code " + connectionResult.getErrorCode());
         }
@@ -320,7 +352,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Markers.add(marker);
         String id = UUID.randomUUID().toString();
         GeoCacheProvider.CreateGeoCache(name, id, point.latitude, point.longitude, marker.getId());
-        GeoCacheProvider.saveGeoCacheListIntoPrefs(this);
+     //   GeoCacheProvider.saveGeoCacheListIntoPrefs(this);
         //TODO: Das hier ist nur ein Test
         final SaveGeoCache saveGeoCache = new SaveGeoCache();
         saveGeoCache.GeoCacheID = id;

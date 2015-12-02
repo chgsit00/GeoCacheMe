@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity
             {
                 geoCacheServerProvider.StartGeoCacheServerProvider();
             }
-            else handler.postDelayed(GeoCacheServerProviderRunnable, 1000);
+            handler.postDelayed(GeoCacheServerProviderRunnable, 1000);
         }
     };
 
