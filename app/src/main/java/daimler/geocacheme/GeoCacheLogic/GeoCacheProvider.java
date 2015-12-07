@@ -30,25 +30,31 @@ public class GeoCacheProvider
 
     public static void CreateGeoCache(String name, String iD, double latitude, double longitude)
     {
-        GeoCache geoCache = new GeoCache();
-        geoCache.Id = iD;
-        geoCache.Name = name;
-        geoCache.Latitude = latitude;
-        geoCache.Longitude = longitude;
-        geoCache.Currentlyvisited = false;
-        GeoCacheList.add(geoCache);
+        if (!GeoCacheProvider.GeoCacheAlreadyExists(iD))
+        {
+            GeoCache geoCache = new GeoCache();
+            geoCache.Id = iD;
+            geoCache.Name = name;
+            geoCache.Latitude = latitude;
+            geoCache.Longitude = longitude;
+            geoCache.Currentlyvisited = false;
+            GeoCacheList.add(geoCache);
+        }
     }
 
     public static void CreateGeoCache(String name, String iD, double latitude, double longitude, String markerID)
     {
-        GeoCache geoCache = new GeoCache();
-        geoCache.Id = iD;
-        geoCache.Name = name;
-        geoCache.Latitude = latitude;
-        geoCache.Longitude = longitude;
-        geoCache.MarkerID = markerID;
-        geoCache.Currentlyvisited = false;
-        GeoCacheList.add(geoCache);
+        if (!GeoCacheProvider.GeoCacheAlreadyExists(iD))
+        {
+            GeoCache geoCache = new GeoCache();
+            geoCache.Id = iD;
+            geoCache.Name = name;
+            geoCache.Latitude = latitude;
+            geoCache.Longitude = longitude;
+            geoCache.MarkerID = markerID;
+            geoCache.Currentlyvisited = false;
+            GeoCacheList.add(geoCache);
+        }
     }
 
     public static List<GeoCache> GetGeoCacheList()
@@ -90,6 +96,7 @@ public class GeoCacheProvider
             if (geoCache.Id == id)
             {
                 s = true;
+                return s;
             }
         }
         return s;

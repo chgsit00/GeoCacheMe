@@ -131,7 +131,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         id = UUID.randomUUID().toString();
         GeoCacheProvider.CreateGeoCache("Mensa Hochschule Esslingen", id, 48.74438725435462, 9.32416534420554);
 
-    //    GeoCacheProvider.saveGeoCacheListIntoPrefs(this);
+        //    GeoCacheProvider.saveGeoCacheListIntoPrefs(this);
         //  geoCacheServerProvider.getGeoCacheListFromPrefs(this);
 
         PlaceGeoCacheMarkers();
@@ -146,14 +146,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         public void run()
         {
-            for (GeoCache geoCache : GeoCacheProvider.GeoCacheList)
+            try
             {
-                if (geoCache.MarkerID == null)
+                for (GeoCache geoCache : GeoCacheProvider.GetGeoCacheList())
                 {
-                    PlaceMarkerforNewGeoCache(geoCache);
+                    if (geoCache.MarkerID == null)
+                    {
+                        PlaceMarkerforNewGeoCache(geoCache);
+                    }
                 }
+                handler.postDelayed(MarkerAdder, 1000);
+            } catch (Exception e)
+            {
+                handler.postDelayed(MarkerAdder, 1000);
             }
-            handler.postDelayed(MarkerAdder, 1000);
+
         }
     };
 
@@ -179,23 +186,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         public void run()
         {
-            for (GeoCache geoCache : GeoCacheProvider.GetGeoCacheList())
+            try
             {
-                currentLocation = mMap.getMyLocation();
-
-                if (currentLocation != null)
+                for (GeoCache geoCache : GeoCacheProvider.GetGeoCacheList())
                 {
-                    currentLatitude = currentLocation.getLatitude();
-                    currentLongitude = currentLocation.getLongitude();
-                    distance = distFrom(currentLatitude, currentLongitude, geoCache.Latitude, geoCache.Longitude);
-                    if (distance < 100 && geoCache.MarkerID != null)
+                    currentLocation = mMap.getMyLocation();
+
+                    if (currentLocation != null)
                     {
-                        setMarkerAsVisited(geoCache.MarkerID, geoCache.Currentlyvisited);
-                        geoCache.Currentlyvisited = true;
+                        currentLatitude = currentLocation.getLatitude();
+                        currentLongitude = currentLocation.getLongitude();
+                        distance = distFrom(currentLatitude, currentLongitude, geoCache.Latitude, geoCache.Longitude);
+                        if (distance < 100 && geoCache.MarkerID != null)
+                        {
+                            setMarkerAsVisited(geoCache.MarkerID, geoCache.Currentlyvisited);
+                            geoCache.Currentlyvisited = true;
+                        }
                     }
                 }
+                handler.postDelayed(DistanceCalculator, 1000);
+            } catch (Exception e)
+            {
+                handler.postDelayed(DistanceCalculator, 1000);
             }
-            handler.postDelayed(DistanceCalculator, 1000);
+
         }
     };
 
@@ -352,7 +366,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Markers.add(marker);
         String id = UUID.randomUUID().toString();
         GeoCacheProvider.CreateGeoCache(name, id, point.latitude, point.longitude, marker.getId());
-     //   GeoCacheProvider.saveGeoCacheListIntoPrefs(this);
+        //   GeoCacheProvider.saveGeoCacheListIntoPrefs(this);
         //TODO: Das hier ist nur ein Test
         final SaveGeoCache saveGeoCache = new SaveGeoCache();
         saveGeoCache.GeoCacheID = id;

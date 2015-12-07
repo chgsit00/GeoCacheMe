@@ -42,6 +42,7 @@ public class GeoCacheServerProvider
         // Loading geoCaches in Background Thread
         new LoadAllGeoCaches().execute();
     }
+
     /**
      * Background Async Task to Load all product by making HTTP Request
      */
@@ -97,10 +98,7 @@ public class GeoCacheServerProvider
                         String name = c.getString(TAG_NAME);
                         double latitude = c.getDouble(TAG_LATITUDE);
                         double longitude = c.getDouble(TAG_LONGITUDE);
-                        if (!GeoCacheProvider.GeoCacheAlreadyExists(id))
-                        {
-                            GeoCacheProvider.CreateGeoCache(name, id, latitude, longitude);
-                        }
+                        GeoCacheProvider.CreateGeoCache(name, id, latitude, longitude);
                     }
                 }
                 else
