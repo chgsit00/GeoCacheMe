@@ -9,6 +9,7 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by CGsch on 16.11.2015.
@@ -93,7 +94,7 @@ public class GeoCacheProvider
         boolean s = false;
         for (GeoCache geoCache : GeoCacheList)
         {
-            if (geoCache.Id == id)
+            if (id.equals(geoCache.Id))
             {
                 s = true;
                 return s;
