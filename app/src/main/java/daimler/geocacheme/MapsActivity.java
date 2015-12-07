@@ -13,6 +13,7 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -120,8 +121,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Load custom marker icon
         markerIconBitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.auto48);
 
-        //TODO: Noch statisch zum Testen
+        GeoCache_Setup();
+    }
 
+
+    public void GeoCache_Setup()
+    {
+        //TODO: Noch statisch zum Testen
         String id = UUID.randomUUID().toString();
         GeoCacheProvider.CreateGeoCache("Berlin", id, 52.520007, 13.404953999999975);
 
@@ -130,14 +136,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         id = UUID.randomUUID().toString();
         GeoCacheProvider.CreateGeoCache("Mensa Hochschule Esslingen", id, 48.74438725435462, 9.32416534420554);
-
         //    GeoCacheProvider.saveGeoCacheListIntoPrefs(this);
         //  geoCacheServerProvider.getGeoCacheListFromPrefs(this);
-
         PlaceGeoCacheMarkers();
-
         mMap.setOnMapLongClickListener(this);
-
         MarkerAdder.run();
     }
 
@@ -278,6 +280,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onResume()
     {
         super.onResume();
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         DistanceCalculator.run();
         mGoogleApiClient.connect();
     }
@@ -286,6 +289,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onPause()
     {
         super.onPause();
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         handler.removeCallbacks(DistanceCalculator);
         if (mGoogleApiClient.isConnected())
         {
@@ -461,5 +465,3 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 }
-
-

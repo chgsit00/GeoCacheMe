@@ -14,15 +14,15 @@
     tools:showIn="@layout/activity_main">
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="1"
-        android:id="@+id/linearLayout"
-        android:layout_below="@+id/linearLayout2"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="35dp">
+        android:layout_below="@+id/linearLayout2"
+        android:layout_marginTop="35dp"
+        android:orientation="horizontal"
+        android:weightSum="1">
 
         <ImageButton
             android:id="@+id/mapbutton"
@@ -30,9 +30,9 @@
             android:layout_height="120dp"
             android:layout_marginLeft="30dp"
             android:layout_marginTop="60dp"
-            android:scaleType="fitCenter"
             android:background="@null"
-            android:text="@string/MapButtonText"></ImageButton>
+            android:scaleType="fitCenter"
+            android:text="@string/MapButtonText"/>
 
         <ImageButton
             android:id="@+id/userbutton"
@@ -40,8 +40,8 @@
             android:layout_height="120dp"
             android:layout_marginLeft="50dp"
             android:layout_marginTop="60dp"
-            android:scaleType="fitCenter"
             android:background="@null"
+            android:scaleType="fitCenter"
             android:text="@string/MapButtonText">
         </ImageButton>
 
@@ -49,11 +49,11 @@
 
 
     <LinearLayout
+        android:id="@+id/linearLayout2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="1"
-        android:id="@+id/linearLayout2">
+        android:weightSum="1">
 
     </LinearLayout>
 
@@ -61,14 +61,24 @@
         android:id="@+id/optionsbutton"
         android:layout_width="120dp"
         android:layout_height="120dp"
-        android:layout_marginTop="57dp"
-        android:scaleType="fitCenter"
-        android:text="@string/MapButtonText"
         android:layout_below="@+id/linearLayout"
-        android:layout_toRightOf="@+id/linearLayout2"
-        android:layout_toEndOf="@+id/linearLayout2"
         android:layout_marginLeft="35dp"
         android:layout_marginStart="35dp"
+        android:layout_marginTop="57dp"
+        android:layout_toEndOf="@+id/linearLayout2"
+        android:layout_toRightOf="@+id/linearLayout2"
         android:background="@null"
-        ></ImageButton>
+        android:scaleType="fitCenter"
+        android:text="@string/MapButtonText"
+        />
+
+    <ImageButton
+        android:id="@+id/exitbutton"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_alignBottom="@+id/optionsbutton"
+        android:layout_alignEnd="@+id/linearLayout"
+        android:layout_alignRight="@+id/linearLayout"
+        android:background="@null"
+        android:scaleType="fitCenter"/>
 </RelativeLayout>

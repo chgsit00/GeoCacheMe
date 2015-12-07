@@ -74,8 +74,42 @@ public class MainActivity extends AppCompatActivity
 
         optionsButton.setImageResource(R.drawable.optionsmenu);
 
-        View view = (LayoutInflater.from(MainActivity.this)).inflate(R.layout.user_dialog, null);
+        ImageButton exitButton = (ImageButton) findViewById(R.id.exitbutton);
+        exitButton.setImageResource(R.drawable.xicon);
 
+        View.OnClickListener findClickListener3 = new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                View exitView = (LayoutInflater.from(MainActivity.this)).inflate(R.layout.exit_dialog, null);
+                AlertDialog.Builder exitBuilder = new AlertDialog.Builder(MainActivity.this);
+                exitBuilder.setView(exitView);
+                exitBuilder.setCancelable(true);
+                exitBuilder.setNegativeButton("No", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        dialog.dismiss();
+                        dialog.cancel();
+                    }
+                });
+                exitBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        finish();
+                        System.exit(0);
+                    }
+                });
+                exitBuilder.show();
+            }
+        };
+        exitButton.setOnClickListener(findClickListener3);
+
+        View view = (LayoutInflater.from(MainActivity.this)).inflate(R.layout.user_dialog, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setView(view);
         final EditText userInput = (EditText) view.findViewById(R.id.userinput);
