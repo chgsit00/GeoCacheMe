@@ -14,11 +14,14 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 import java.util.UUID;
+
 import android.os.Handler;
+
 import daimler.geocacheme.GeoCacheLogic.GeoCacheProvider;
 import daimler.geocacheme.InternetConnection.InternetConnectionTester;
 import daimler.geocacheme.Server.GeoCacheServerProvider;
 import daimler.geocacheme.Server.SaveGeoCache;
+import daimler.geocacheme.Server.UserServerProvider;
 import daimler.geocacheme.UserManagement.User;
 import daimler.geocacheme.UserManagement.UserManagement;
 
@@ -139,14 +142,18 @@ public class MainActivity extends AppCompatActivity
     class CheckInternetConnectionTask extends AsyncTask<String, Void, String>
     {
         @Override
-        protected String doInBackground(String... params) {
-            try{
-                if(internetConnectionTester.hasActiveInternetConnection(MainActivity.this)){
+        protected String doInBackground(String... params)
+        {
+            try
+            {
+                if (internetConnectionTester.hasActiveInternetConnection(MainActivity.this))
+                {
                     internetCheck = true;
                 }
                 else internetCheck = false;
                 return "1";
-            }catch (Exception e){
+            } catch (Exception e)
+            {
                 Log.i("Internet Connection", "Connection failed");
             }
             return "0";
@@ -157,6 +164,8 @@ public class MainActivity extends AppCompatActivity
     {
         public Handler handler = new Handler();
         final SaveGeoCache saveGeoCache = new SaveGeoCache();
+        final UserServerProvider userServerProvider = new UserServerProvider();
+
         @Override
         public void run()
         {
@@ -165,8 +174,10 @@ public class MainActivity extends AppCompatActivity
             if (internetCheck)
             {
                 geoCacheServerProvider.StartGeoCacheServerProvider();
-                if(Owner != null){
+                if (Owner != null)
+                {
                     saveGeoCache.StartSaveGeoCache(Owner.ID);
+                    userServerProvider.StartUserServerProvider(Owner.Name, Owner.ID);
                 }
                 GeoCacheProvider.saveGeoCacheListIntoPrefs(MainActivity.this);
             }
