@@ -21,7 +21,7 @@ public class InternetConnectionTester
 {
     private static final String LOG_TAG = "InternetStatus";
 
-    public boolean hasActiveInternetConnection(Context context)
+    public boolean hasActiveInternetConnection2(Context context)
     {
         ConnectivityManager cm =
                 (ConnectivityManager)
@@ -31,7 +31,7 @@ public class InternetConnectionTester
                 activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 
-    public boolean hasActiveInternetConnection2(Context context)
+    public boolean hasActiveInternetConnection(Context context)
     {
         if (isNetworkAvailable((Activity) context))
         {

@@ -11,9 +11,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import daimler.geocacheme.GeoCacheLogic.GeoCache;
 import daimler.geocacheme.GeoCacheLogic.GeoCacheProvider;
-import daimler.geocacheme.MainActivity;
 
 /**
  * Created by CGsch on 01.12.2015.

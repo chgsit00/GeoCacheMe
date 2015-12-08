@@ -10,11 +10,12 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Observable;
 
 /**
  * Created by CGsch on 16.11.2015.
  */
-public class GeoCacheProvider
+public class GeoCacheProvider extends Observable
 {
     public static List<GeoCache> GeoCacheList = new ArrayList<GeoCache>();
     static SharedPreferences geoCachePrefs;
@@ -82,11 +83,6 @@ public class GeoCacheProvider
         {
         }.getType();
         return gson.fromJson(jsonGeoCaches, type);
-    }
-
-    public static void SaveNewGeoCachesIntoPrefs(Context context)
-    {
-
     }
 
     public static boolean GeoCacheAlreadyExists(String id)

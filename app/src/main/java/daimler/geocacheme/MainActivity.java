@@ -33,8 +33,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         geoCacheServerProvider = new GeoCacheServerProvider();
         internetConnectionTester = new InternetConnectionTester();
-        Thread t = new Thread(GeoCacheServerProviderRunnable);
-        t.start();
+
         GeoCacheProvider.SetGeoCacheListfromPrefs(MainActivity.this);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -100,6 +99,8 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onClick(DialogInterface dialog, int which)
                     {
+                        dialog.dismiss();
+                        dialog.cancel();
                         finish();
                         System.exit(0);
                     }
@@ -129,6 +130,9 @@ public class MainActivity extends AppCompatActivity
         {
             builder.show();
         }
+
+        Thread t = new Thread(GeoCacheServerProviderRunnable);
+        t.start();
     }
 
     class CheckInternetConnectionTask extends AsyncTask<String, Void, String>
