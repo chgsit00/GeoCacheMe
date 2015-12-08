@@ -12,10 +12,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Observable;
 
+import daimler.geocacheme.MainActivity;
+
 /**
  * Created by CGsch on 16.11.2015.
  */
-public class GeoCacheProvider extends Observable
+public class GeoCacheProvider
 {
     public static List<GeoCache> GeoCacheList = new ArrayList<GeoCache>();
     static SharedPreferences geoCachePrefs;
@@ -23,7 +25,7 @@ public class GeoCacheProvider extends Observable
 
     public static void SetGeoCacheListfromPrefs(Context context)
     {
-       // GeoCacheList = getGeoCacheListFromPrefs(context);
+        GeoCacheList = getGeoCacheListFromPrefs(context);
         if (GeoCacheList == null)
         {
             GeoCacheList = new ArrayList<GeoCache>();
@@ -66,6 +68,7 @@ public class GeoCacheProvider extends Observable
 
     public static void saveGeoCacheListIntoPrefs(Context context)
     {
+        context.getSharedPreferences("GeoCacheObject", 0).edit().clear().apply();
         geoCachePrefs = context.getSharedPreferences("GeoCacheObject", Context.MODE_PRIVATE);
         prefsEditor = geoCachePrefs.edit();
         Gson gson = new Gson();

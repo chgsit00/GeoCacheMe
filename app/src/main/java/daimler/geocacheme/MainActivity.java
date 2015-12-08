@@ -162,6 +162,7 @@ public class MainActivity extends AppCompatActivity
             if (internetCheck)
             {
                 geoCacheServerProvider.StartGeoCacheServerProvider();
+                GeoCacheProvider.saveGeoCacheListIntoPrefs(MainActivity.this);
             }
             handler.postDelayed(GeoCacheServerProviderRunnable, 1000);
         }

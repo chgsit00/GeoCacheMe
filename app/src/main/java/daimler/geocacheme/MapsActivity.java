@@ -190,7 +190,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         {
             try
             {
-                for (GeoCache geoCache : GeoCacheProvider.GetGeoCacheList())
+                for (GeoCache geoCache : GeoCacheProvider.GeoCacheList)
                 {
                     currentLocation = mMap.getMyLocation();
 
@@ -203,6 +203,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         {
                             setMarkerAsVisited(geoCache.MarkerID, geoCache.Currentlyvisited);
                             geoCache.Currentlyvisited = true;
+                            GeoCacheProvider.saveGeoCacheListIntoPrefs(MapsActivity.this);
                         }
                     }
                 }
@@ -386,6 +387,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if (internetCheck)
                 {
                     saveGeoCache.StartSaveGeoCache();
+                    GeoCacheProvider.saveGeoCacheListIntoPrefs(MapsActivity.this);
                 }
             }
         });
