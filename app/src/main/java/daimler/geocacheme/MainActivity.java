@@ -18,6 +18,7 @@ import android.os.Handler;
 import daimler.geocacheme.GeoCacheLogic.GeoCacheProvider;
 import daimler.geocacheme.InternetConnection.InternetConnectionTester;
 import daimler.geocacheme.Server.GeoCacheServerProvider;
+import daimler.geocacheme.Server.SaveGeoCache;
 import daimler.geocacheme.UserManagement.User;
 import daimler.geocacheme.UserManagement.UserManagement;
 
@@ -155,13 +156,18 @@ public class MainActivity extends AppCompatActivity
     public Runnable GeoCacheServerProviderRunnable = new Runnable()
     {
         public Handler handler = new Handler();
+        final SaveGeoCache saveGeoCache = new SaveGeoCache();
         @Override
         public void run()
         {
+            User Owner = UserManagement.getUserFromPrefs(MainActivity.this);
             new CheckInternetConnectionTask().execute();
             if (internetCheck)
             {
                 geoCacheServerProvider.StartGeoCacheServerProvider();
+                if(Owner != null){
+                    saveGeoCache.StartSaveGeoCache(Owner.ID);
+                }
                 GeoCacheProvider.saveGeoCacheListIntoPrefs(MainActivity.this);
             }
             handler.postDelayed(GeoCacheServerProviderRunnable, 1000);

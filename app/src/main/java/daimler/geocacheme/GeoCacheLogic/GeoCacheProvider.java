@@ -9,10 +9,6 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Observable;
-
-import daimler.geocacheme.MainActivity;
 
 /**
  * Created by CGsch on 16.11.2015.
@@ -41,12 +37,12 @@ public class GeoCacheProvider
             geoCache.Name = name;
             geoCache.Latitude = latitude;
             geoCache.Longitude = longitude;
-            geoCache.Currentlyvisited = false;
+            geoCache.Visited = false;
             GeoCacheList.add(geoCache);
         }
     }
 
-    public static void CreateGeoCache(String name, String iD, double latitude, double longitude, String markerID)
+    public static void CreateGeoCache(String name, String iD, double latitude, double longitude, String markerID, String ownerID)
     {
         if (!GeoCacheProvider.GeoCacheAlreadyExists(iD))
         {
@@ -56,7 +52,8 @@ public class GeoCacheProvider
             geoCache.Latitude = latitude;
             geoCache.Longitude = longitude;
             geoCache.MarkerID = markerID;
-            geoCache.Currentlyvisited = false;
+            geoCache.OwnerID = ownerID;
+            geoCache.Visited = false;
             GeoCacheList.add(geoCache);
         }
     }

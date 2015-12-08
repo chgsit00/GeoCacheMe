@@ -41,7 +41,7 @@ import java.util.UUID;
 import daimler.geocacheme.GeoCacheLogic.GeoCache;
 import daimler.geocacheme.GeoCacheLogic.GeoCacheProvider;
 import daimler.geocacheme.InternetConnection.InternetConnectionTester;
-import daimler.geocacheme.Server.SaveGeoCache;
+import daimler.geocacheme.UserManagement.UserManagement;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener, GoogleMap.OnMapLongClickListener,
@@ -128,16 +128,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void GeoCache_Setup()
     {
         //TODO: Noch statisch zum Testen
-        String id = UUID.randomUUID().toString();
-        GeoCacheProvider.CreateGeoCache("Berlin", id, 52.520007, 13.404953999999975);
+    //    String id = UUID.randomUUID().toString();
+    //    GeoCacheProvider.CreateGeoCache("Berlin", id, 52.520007, 13.404953999999975);
+//
+    //    id = UUID.randomUUID().toString();
+    //    GeoCacheProvider.CreateGeoCache("Hochschule Esslingen", id, 48.7453375, 9.322090099999969);
+//
+    //    id = UUID.randomUUID().toString();
+    //    GeoCacheProvider.CreateGeoCache("Mensa Hochschule Esslingen", id, 48.74438725435462, 9.32416534420554);
 
-        id = UUID.randomUUID().toString();
-        GeoCacheProvider.CreateGeoCache("Hochschule Esslingen", id, 48.7453375, 9.322090099999969);
-
-        id = UUID.randomUUID().toString();
-        GeoCacheProvider.CreateGeoCache("Mensa Hochschule Esslingen", id, 48.74438725435462, 9.32416534420554);
-        //    GeoCacheProvider.saveGeoCacheListIntoPrefs(this);
-        //  geoCacheServerProvider.getGeoCacheListFromPrefs(this);
         PlaceGeoCacheMarkers();
         mMap.setOnMapLongClickListener(this);
         MarkerAdder.run();
@@ -168,7 +167,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void PlaceMarkerforNewGeoCache(GeoCache geoCache)
     {
-        geoCache.Currentlyvisited = false;
+        geoCache.Visited = false;
         LatLng markerLatLng = new LatLng(geoCache.Latitude, geoCache.Longitude);
         String geoCacheName = geoCache.Name;
         MarkerOptions options = new MarkerOptions();
@@ -198,11 +197,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     {
                         currentLatitude = currentLocation.getLatitude();
                         currentLongitude = currentLocation.getLongitude();
-                        distance = distFrom(currentLatitude, currentLongitude, geoCache.Latitude, geoCache.Longitude);
+                        distance = CalculateDistance(currentLatitude, currentLongitude, geoCache.Latitude, geoCache.Longitude);
                         if (distance < 100 && geoCache.MarkerID != null)
                         {
-                            setMarkerAsVisited(geoCache.MarkerID, geoCache.Currentlyvisited);
-                            geoCache.Currentlyvisited = true;
+                            setMarkerAsVisited(geoCache.MarkerID, geoCache.Visited);
+                            geoCache.Visited = true;
                             GeoCacheProvider.saveGeoCacheListIntoPrefs(MapsActivity.this);
                         }
                     }
@@ -216,7 +215,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     };
 
-    public static double distFrom(double lat1, double lng1, double lat2, double lng2)
+    public static double CalculateDistance(double lat1, double lng1, double lat2, double lng2)
     {
         double earthRadius = 6371000; //meters
         double dLat = Math.toRadians(lat2 - lat1);
@@ -330,11 +329,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         List<GeoCache> geoCacheList = GeoCacheProvider.GetGeoCacheList();
         for (GeoCache geoCache : geoCacheList)
         {
-            geoCache.Currentlyvisited = false;
             LatLng markerLatLng = new LatLng(geoCache.Latitude, geoCache.Longitude);
             String geoCacheName = geoCache.Name;
             MarkerOptions options = new MarkerOptions();
-            options.position(markerLatLng).icon(BitmapDescriptorFactory.fromResource(R.drawable.blau_logo_72)).title(geoCacheName);
+            options.position(markerLatLng).title(geoCacheName);
+            if (geoCache.Visited)
+            {
+                options.icon(BitmapDescriptorFactory.fromResource(R.drawable.gruen_logo_72));
+            }
+            else
+            {
+                options.icon(BitmapDescriptorFactory.fromResource(R.drawable.blau_logo_72));
+            }
             Marker marker = mMap.addMarker(options);
             geoCache.MarkerID = marker.getId();
             Markers.add(marker);
@@ -370,28 +376,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.blau_logo_72)));
         Markers.add(marker);
         String id = UUID.randomUUID().toString();
-        GeoCacheProvider.CreateGeoCache(name, id, point.latitude, point.longitude, marker.getId());
-        //   GeoCacheProvider.saveGeoCacheListIntoPrefs(this);
-        //TODO: Das hier ist nur ein Test
-        final SaveGeoCache saveGeoCache = new SaveGeoCache();
-        saveGeoCache.GeoCacheID = id;
-        saveGeoCache.GeoCacheName = name;
-        saveGeoCache.GeoCacheLatitude = point.latitude;
-        saveGeoCache.GeoCacheLongitude = point.longitude;
-        Thread t = new Thread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                internetCheck = internetTester.hasActiveInternetConnection(MapsActivity.this);
-                if (internetCheck)
-                {
-                    saveGeoCache.StartSaveGeoCache();
-                    GeoCacheProvider.saveGeoCacheListIntoPrefs(MapsActivity.this);
-                }
-            }
-        });
-        t.start();
+        String userId = UserManagement.getUserFromPrefs(MapsActivity.this).ID;
+        GeoCacheProvider.CreateGeoCache(name, id, point.latitude, point.longitude, marker.getId(), userId);
     }
 
     @Override

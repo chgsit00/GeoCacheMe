@@ -11,6 +11,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import daimler.geocacheme.GeoCacheLogic.GeoCache;
+import daimler.geocacheme.GeoCacheLogic.GeoCacheProvider;
+
 /**
  * Created by CGsch on 01.12.2015.
  */
@@ -22,10 +25,22 @@ public class SaveGeoCache
     public String GeoCacheID;
     public double GeoCacheLatitude;
     public double GeoCacheLongitude;
+    public String GeoCacheOwnerID;
 
-    public void StartSaveGeoCache()
+    public void StartSaveGeoCache(String ownerID)
     {
-        new SaveGeoCacheTask().execute();
+        for (GeoCache geoCache : GeoCacheProvider.GetGeoCacheList())
+        {
+            if(ownerID.equals(geoCache.OwnerID))
+            {
+                GeoCacheName = geoCache.Name;
+                GeoCacheID = geoCache.Id;
+                GeoCacheLatitude = geoCache.Latitude;
+                GeoCacheLongitude = geoCache.Longitude;
+              //  GeoCacheOwnerID = geoCache.OwnerID;
+                new SaveGeoCacheTask().execute();
+            }
+        }
     }
 
     class SaveGeoCacheTask extends AsyncTask<String, String, String>
@@ -35,7 +50,6 @@ public class SaveGeoCache
         JSONParser jsonParser = new JSONParser();
         // JSON Node names
         private static final String TAG_SUCCESS = "success";
-
 
 
         /**
