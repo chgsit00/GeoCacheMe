@@ -8,30 +8,36 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.security.Provider;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by CGsch on 08.12.2015.
- */
-public class UserServerProvider
-{
-    static String UserName = "";
-    static String UserID;
-    //TODO: Auf richtigen PHP Namen ändern
-    private static String url_create_user = "http://geocacheme.bplaced.net/create_visitor.php";
+import daimler.geocacheme.GeoCacheLogic.GeoCache;
+import daimler.geocacheme.GeoCacheLogic.GeoCacheProvider;
 
-    public void StartUserServerProvider(String userName, String userID)
+/**
+ * Created by CGsch on 09.12.2015.
+ */
+public class VisitGeoCache
+{
+    private static String url_create_geocache = "http://geocacheme.bplaced.net/geovisit.php";
+    public String UserID;
+    public String GeoCacheID;
+
+    public void StartVisitGeoCache(String userID)
     {
-        if (!UserName.equals(userName))
+        UserID = userID;
+        for (GeoCache geoCache : GeoCacheProvider.GetGeoCacheList())
         {
-            UserName = userName;
-            UserID = userID;
-            new SaveUserTask().execute();
+            if (geoCache.Visited)
+            {
+                GeoCacheID = geoCache.Id;
+                new VisitGeoCacheTask().execute();
+            }
         }
     }
 
-    class SaveUserTask extends AsyncTask<String, String, String>
+    class VisitGeoCacheTask extends AsyncTask<String, String, String>
     {
         // url to create new product
 
@@ -39,25 +45,32 @@ public class UserServerProvider
         // JSON Node names
         private static final String TAG_SUCCESS = "success";
 
+
+        /**
+         * Before starting background thread Show Progress Dialog
+         */
         @Override
         protected void onPreExecute()
         {
             super.onPreExecute();
         }
 
+        /**
+         * Creating product
+         */
         protected String doInBackground(String... args)
         {
-            String name = UserName;
-            String id = UserID;
+            String userID = UserID;
+            String geoCacheID = GeoCacheID;
 
             // Building Parameters
             List<NameValuePair> params = new ArrayList<NameValuePair>();
-            params.add(new BasicNameValuePair("id", id));
-            params.add(new BasicNameValuePair("name", name));
+            params.add(new BasicNameValuePair("G_ID", geoCacheID));
+            params.add(new BasicNameValuePair("V_ID", userID));
 
             // getting JSON Object
             // Note that create product url accepts POST method
-            JSONObject json = jsonParser.makeHttpRequest(url_create_user,
+            JSONObject json = jsonParser.makeHttpRequest(url_create_geocache,
                     "POST", params);
 
             // check log cat fro response

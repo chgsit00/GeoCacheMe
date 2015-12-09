@@ -22,6 +22,7 @@ import daimler.geocacheme.InternetConnection.InternetConnectionTester;
 import daimler.geocacheme.Server.GeoCacheServerProvider;
 import daimler.geocacheme.Server.SaveGeoCache;
 import daimler.geocacheme.Server.UserServerProvider;
+import daimler.geocacheme.Server.VisitGeoCache;
 import daimler.geocacheme.UserManagement.User;
 import daimler.geocacheme.UserManagement.UserManagement;
 
@@ -165,7 +166,7 @@ public class MainActivity extends AppCompatActivity
         public Handler handler = new Handler();
         final SaveGeoCache saveGeoCache = new SaveGeoCache();
         final UserServerProvider userServerProvider = new UserServerProvider();
-
+        final VisitGeoCache visitGeoCache = new VisitGeoCache();
         @Override
         public void run()
         {
@@ -178,6 +179,7 @@ public class MainActivity extends AppCompatActivity
                 {
                     saveGeoCache.StartSaveGeoCache(Owner.ID);
                     userServerProvider.StartUserServerProvider(Owner.Name, Owner.ID);
+                    visitGeoCache.StartVisitGeoCache(Owner.ID);
                 }
                 GeoCacheProvider.saveGeoCacheListIntoPrefs(MainActivity.this);
             }
