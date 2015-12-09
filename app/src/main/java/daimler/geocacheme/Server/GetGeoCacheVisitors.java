@@ -63,7 +63,7 @@ public class GetGeoCacheVisitors
             params.add(new BasicNameValuePair("ID", id));
 
             // getting JSON string from URL
-            JSONObject json = jParser.makeHttpRequest(url_all_visitors, "GET", params);
+            JSONObject json = jParser.makeHttpRequest(url_all_visitors, "POST", params);
 
             // Check your log cat for JSON reponse
             Log.i("Visitors_found: ", "Response received");
@@ -104,7 +104,7 @@ public class GetGeoCacheVisitors
                     //   // Closing all previous activities
                     //   i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     //   startActivity(i);
-                    Log.i("GET", "funktioniert nicht");
+                    Log.i("GETVISITORS", "funktioniert nicht");
                 }
             } catch (JSONException e)
             {
