@@ -11,6 +11,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by CGsch on 09.12.2015.
@@ -25,19 +26,22 @@ public class GetGeoCacheVisitors
     // JSON Node names
     private static final String TAG_SUCCESS = "success";
     private static final String TAG_VISITORS = "visitors";
+    private static final String TAG_NAME = "name";
 
     public String GeoCacheID = null;
-
+    public List<String> VisitorList;
     // visitors JSONArray
     JSONArray visitors = null;
 
-    public void StartGetGeoCacheVisitors(String geoCacheID)
+    public List<String> StartGetGeoCacheVisitors(String geoCacheID) throws ExecutionException, InterruptedException
     {
         GeoCacheID = geoCacheID;
         if (GeoCacheID != null)
         {
-            new GetAllVisitorsTask().execute();
+            GetAllVisitorsTask task = new GetAllVisitorsTask();
+            String succes = task.execute().get();
         }
+        return VisitorList;
     }
 
     class GetAllVisitorsTask extends AsyncTask<String, String, String>
@@ -85,14 +89,16 @@ public class GetGeoCacheVisitors
                     // visitors found
                     // Getting Array of Products
                     visitors = json.getJSONArray(TAG_VISITORS);
-
+                    VisitorList = new ArrayList<String>();
                     // looping through All Products
                     for (int i = 0; i < visitors.length(); i++)
                     {
                         JSONObject c = visitors.getJSONObject(i);
 
                         // Storing each json item in variable
-                        String name = c.toString();
+                        String name = c.getString(TAG_NAME);
+                        Log.i("VisitorName", name);
+                        VisitorList.add(name);
                     }
                 }
                 else
@@ -122,5 +128,7 @@ public class GetGeoCacheVisitors
             // dismiss the dialog after getting all visitors
 
         }
+
+
     }
 }

@@ -14,8 +14,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -37,6 +40,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 import daimler.geocacheme.GeoCacheLogic.GeoCache;
 import daimler.geocacheme.GeoCacheLogic.GeoCacheProvider;
@@ -417,7 +421,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v)
             {
                 Log.i("GetGeoCacheVisitors", "Hier");
-                getGeoCacheVisitors.StartGetGeoCacheVisitors(text);
+                try
+                {
+                    List<String> visitors = getGeoCacheVisitors.StartGetGeoCacheVisitors(text);
+                    View visitorsView = (LayoutInflater.from(MapsActivity.this)).inflate(R.layout.visitors_window, null);
+                    AlertDialog.Builder exitBuilder = new AlertDialog.Builder(MapsActivity.this);
+                    exitBuilder.setView(visitorsView);
+                    exitBuilder.setCancelable(true);
+                    exitBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            dialog.dismiss();
+                            dialog.cancel();
+                        }
+                    });
+                    TextView list = (TextView) visitorsView.findViewById(R.id.list);
+                    for (String visitor : visitors)
+                    {
+                        list.append("\n"+visitor);
+                    }
+                    exitBuilder.show();
+                } catch (InterruptedException | ExecutionException e)
+                {
+                }
             }
         };
         if (geoCacheID != null)
