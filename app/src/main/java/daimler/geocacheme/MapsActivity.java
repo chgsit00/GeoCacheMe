@@ -41,11 +41,12 @@ import java.util.UUID;
 import daimler.geocacheme.GeoCacheLogic.GeoCache;
 import daimler.geocacheme.GeoCacheLogic.GeoCacheProvider;
 import daimler.geocacheme.InternetConnection.InternetConnectionTester;
+import daimler.geocacheme.Server.GetGeoCacheVisitors;
 import daimler.geocacheme.UserManagement.UserManagement;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener, GoogleMap.OnMapLongClickListener,
-        GoogleMap.OnMyLocationChangeListener
+        GoogleMap.OnMyLocationChangeListener, GoogleMap.OnMarkerClickListener
 {
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
@@ -73,7 +74,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = fragment.getMap();
         mMap.setMyLocationEnabled(true);
         mMap.setOnMyLocationChangeListener(this);
-
+        mMap.setOnMarkerClickListener(this);
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -128,14 +129,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void GeoCache_Setup()
     {
         //TODO: Noch statisch zum Testen
-    //    String id = UUID.randomUUID().toString();
-    //    GeoCacheProvider.CreateGeoCache("Berlin", id, 52.520007, 13.404953999999975);
+        //    String id = UUID.randomUUID().toString();
+        //    GeoCacheProvider.CreateGeoCache("Berlin", id, 52.520007, 13.404953999999975);
 //
-    //    id = UUID.randomUUID().toString();
-    //    GeoCacheProvider.CreateGeoCache("Hochschule Esslingen", id, 48.7453375, 9.322090099999969);
+        //    id = UUID.randomUUID().toString();
+        //    GeoCacheProvider.CreateGeoCache("Hochschule Esslingen", id, 48.7453375, 9.322090099999969);
 //
-    //    id = UUID.randomUUID().toString();
-    //    GeoCacheProvider.CreateGeoCache("Mensa Hochschule Esslingen", id, 48.74438725435462, 9.32416534420554);
+        //    id = UUID.randomUUID().toString();
+        //    GeoCacheProvider.CreateGeoCache("Mensa Hochschule Esslingen", id, 48.74438725435462, 9.32416534420554);
 
         PlaceGeoCacheMarkers();
         mMap.setOnMapLongClickListener(this);
@@ -393,6 +394,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         myLocationMarker = mMap.addMarker(new MarkerOptions()
                 .position(new LatLng(location.getLatitude(), location.getLongitude()))
                 .icon(markerIconBitmapDescriptor));
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker)
+    {
+        String geoCacheID = null;
+        for (GeoCache geoCache : GeoCacheProvider.GetGeoCacheList())
+        {
+            if (geoCache.MarkerID.equals(marker.getId()))
+            {
+                geoCacheID = geoCache.Id;
+            }
+        }
+        final String text = geoCacheID;
+        final GetGeoCacheVisitors getGeoCacheVisitors = new GetGeoCacheVisitors();
+        ImageButton userButton = (ImageButton) findViewById(R.id.showusers);
+        View.OnClickListener onClickListener = new View.OnClickListener()
+        {
+
+            @Override
+            public void onClick(View v)
+            {
+                Log.i("GetGeoCacheVisitors", "Hier");
+                getGeoCacheVisitors.StartGetGeoCacheVisitors(text);
+            }
+        };
+        if (geoCacheID != null)
+        {
+            userButton.setOnClickListener(onClickListener);
+        }
+        return false;
     }
 
     private class GeocoderTask extends AsyncTask<String, Void, List<Address>>

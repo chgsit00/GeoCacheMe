@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,40 +12,35 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import daimler.geocacheme.GeoCacheLogic.GeoCacheProvider;
-
 /**
- * Created by CGsch on 01.12.2015.
+ * Created by CGsch on 09.12.2015.
  */
-public class GeoCacheServerProvider
+public class GetGeoCacheVisitors
 {
-    // Creating JSON Parser object
     JSONParser jParser = new JSONParser();
 
     // url to get all visitors list
-    private static String url_all_geocaches = "http://geocacheme.bplaced.net/get_all_geoCaches.php";
+    private static String url_all_visitors = "http://geocacheme.bplaced.net/return_visitors_of_geocache.php";
 
     // JSON Node names
     private static final String TAG_SUCCESS = "success";
-    private static final String TAG_GEOCACHES = "visitors";
-    private static final String TAG_ID = "id";
-    private static final String TAG_NAME = "name";
-    private static final String TAG_LATITUDE = "gpsLatitude";
-    private static final String TAG_LONGITUDE = "gpsLongitude";
+    private static final String TAG_VISITORS = "visitors";
+
+    public String GeoCacheID = null;
 
     // visitors JSONArray
-    JSONArray geoCaches = null;
+    JSONArray visitors = null;
 
-    public void StartGeoCacheServerProvider()
+    public void StartGetGeoCacheVisitors(String geoCacheID)
     {
-        // Loading visitors in Background Thread
-        new LoadAllGeoCaches().execute();
+        GeoCacheID = geoCacheID;
+        if (GeoCacheID != null)
+        {
+            new GetAllVisitorsTask().execute();
+        }
     }
 
-    /**
-     * Background Async Task to Load all product by making HTTP Request
-     */
-    class LoadAllGeoCaches extends AsyncTask<String, String, String>
+    class GetAllVisitorsTask extends AsyncTask<String, String, String>
     {
         /**
          * Before starting background thread Show Progress Dialog
@@ -60,14 +56,17 @@ public class GeoCacheServerProvider
          */
         protected String doInBackground(String... args)
         {
+            String id = GeoCacheID;
             // Building Parameters
+            Log.i("Visitors_found: ", "Task started");
             List<NameValuePair> params = new ArrayList<NameValuePair>();
+            params.add(new BasicNameValuePair("ID", id));
+
             // getting JSON string from URL
-            JSONObject json = jParser.makeHttpRequest(url_all_geocaches, "GET", params);
+            JSONObject json = jParser.makeHttpRequest(url_all_visitors, "GET", params);
 
             // Check your log cat for JSON reponse
-            Log.i("All Products: ", json.toString());
-
+            Log.i("Visitors_found: ", "Response received");
             try
             {
                 // Checking for SUCCESS TAG
@@ -82,21 +81,18 @@ public class GeoCacheServerProvider
 
                 if (success == 1)
                 {
+                    Log.i("Visitors_found: ", "We found some Visitors");
                     // visitors found
                     // Getting Array of Products
-                    geoCaches = json.getJSONArray(TAG_GEOCACHES);
+                    visitors = json.getJSONArray(TAG_VISITORS);
 
                     // looping through All Products
-                    for (int i = 0; i < geoCaches.length(); i++)
+                    for (int i = 0; i < visitors.length(); i++)
                     {
-                        JSONObject c = geoCaches.getJSONObject(i);
+                        JSONObject c = visitors.getJSONObject(i);
 
                         // Storing each json item in variable
-                        String id = c.getString(TAG_ID);
-                        String name = c.getString(TAG_NAME);
-                        double latitude = c.getDouble(TAG_LATITUDE);
-                        double longitude = c.getDouble(TAG_LONGITUDE);
-                        GeoCacheProvider.CreateGeoCache(name, id, latitude, longitude);
+                        String name = c.toString();
                     }
                 }
                 else
