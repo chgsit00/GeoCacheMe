@@ -26,7 +26,7 @@ public class GeoCacheServerProvider
 
     // JSON Node names
     private static final String TAG_SUCCESS = "success";
-    private static final String TAG_GEOCACHES = "visitors";
+    private static final String TAG_GEOCACHES = "geoCaches";
     private static final String TAG_ID = "id";
     private static final String TAG_NAME = "name";
     private static final String TAG_LATITUDE = "gpsLatitude";
