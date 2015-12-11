@@ -167,6 +167,7 @@ public class MainActivity extends AppCompatActivity
         final SaveGeoCache saveGeoCache = new SaveGeoCache();
         final UserServerProvider userServerProvider = new UserServerProvider();
         final VisitGeoCache visitGeoCache = new VisitGeoCache();
+
         @Override
         public void run()
         {
@@ -174,12 +175,18 @@ public class MainActivity extends AppCompatActivity
             new CheckInternetConnectionTask().execute();
             if (internetCheck)
             {
-                geoCacheServerProvider.StartGeoCacheServerProvider();
-                if (Owner != null)
+                try
                 {
-                    saveGeoCache.StartSaveGeoCache(Owner.ID);
-                    userServerProvider.StartUserServerProvider(Owner.Name, Owner.ID);
-                    visitGeoCache.StartVisitGeoCache(Owner.ID);
+                    geoCacheServerProvider.StartGeoCacheServerProvider();
+                    if (Owner != null)
+                    {
+                        saveGeoCache.StartSaveGeoCache(Owner.ID);
+                        userServerProvider.StartUserServerProvider(Owner.Name, Owner.ID);
+                        visitGeoCache.StartVisitGeoCache(Owner.ID);
+                    }
+                } catch (Exception e)
+                {
+                    handler.postDelayed(GeoCacheServerProviderRunnable, 1000);
                 }
                 GeoCacheProvider.saveGeoCacheListIntoPrefs(MainActivity.this);
             }

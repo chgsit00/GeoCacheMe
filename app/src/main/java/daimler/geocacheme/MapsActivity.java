@@ -421,31 +421,40 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v)
             {
                 Log.i("GetGeoCacheVisitors", "Hier");
+                AlertDialog.Builder exitBuilder = new AlertDialog.Builder(MapsActivity.this);
+                View visitorsView = (LayoutInflater.from(MapsActivity.this)).inflate(R.layout.visitors_window, null);
+                TextView list = (TextView) visitorsView.findViewById(R.id.list);
+                exitBuilder.setView(visitorsView);
+                exitBuilder.setCancelable(true);
+                exitBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        dialog.dismiss();
+                        dialog.cancel();
+                    }
+                });
                 try
                 {
-                    List<String> visitors = getGeoCacheVisitors.StartGetGeoCacheVisitors(text);
-                    View visitorsView = (LayoutInflater.from(MapsActivity.this)).inflate(R.layout.visitors_window, null);
-                    AlertDialog.Builder exitBuilder = new AlertDialog.Builder(MapsActivity.this);
-                    exitBuilder.setView(visitorsView);
-                    exitBuilder.setCancelable(true);
-                    exitBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener()
+                    List<String> visitors = getGeoCacheVisitors.StartGetGeoCacheVisitors(text, MapsActivity.this);
+                    if (visitors != null)
                     {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which)
+                        for (String visitor : visitors)
                         {
-                            dialog.dismiss();
-                            dialog.cancel();
+                            list.append("\n" + visitor);
                         }
-                    });
-                    TextView list = (TextView) visitorsView.findViewById(R.id.list);
-                    for (String visitor : visitors)
-                    {
-                        list.append("\n"+visitor);
                     }
-                    exitBuilder.show();
+                    else
+                    {
+                        list.append("No visitors found");
+                    }
+
                 } catch (InterruptedException | ExecutionException e)
                 {
+                    list.append("Server Connection Error");
                 }
+                exitBuilder.show();
             }
         };
         if (geoCacheID != null)

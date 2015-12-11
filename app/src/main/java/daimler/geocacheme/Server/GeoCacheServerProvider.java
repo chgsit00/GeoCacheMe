@@ -65,56 +65,58 @@ public class GeoCacheServerProvider
             // getting JSON string from URL
             JSONObject json = jParser.makeHttpRequest(url_all_geocaches, "GET", params);
 
-            // Check your log cat for JSON reponse
-            Log.i("All Products: ", json.toString());
-
-            try
+            if (json != null)
             {
-                // Checking for SUCCESS TAG
-                int success = 0;
+                // Check your log cat for JSON reponse
+                Log.i("All Products: ", json.toString());
+
                 try
                 {
-                    success = json.getInt(TAG_SUCCESS);
+                    // Checking for SUCCESS TAG
+                    int success = 0;
+                    try
+                    {
+                        success = json.getInt(TAG_SUCCESS);
+                    } catch (JSONException e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                    if (success == 1)
+                    {
+                        // visitors found
+                        // Getting Array of Products
+                        geoCaches = json.getJSONArray(TAG_GEOCACHES);
+
+                        // looping through All Products
+                        for (int i = 0; i < geoCaches.length(); i++)
+                        {
+                            JSONObject c = geoCaches.getJSONObject(i);
+
+                            // Storing each json item in variable
+                            String id = c.getString(TAG_ID);
+                            String name = c.getString(TAG_NAME);
+                            double latitude = c.getDouble(TAG_LATITUDE);
+                            double longitude = c.getDouble(TAG_LONGITUDE);
+                            GeoCacheProvider.CreateGeoCache(name, id, latitude, longitude);
+                        }
+                    }
+                    else
+                    {
+                        // no visitors found
+                        // Launch Add New product Activity
+                        //   Intent i = new Intent(getApplicationContext(),
+                        //           NewProductActivity.class);
+                        //   // Closing all previous activities
+                        //   i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        //   startActivity(i);
+                        Log.i("GET", "funktioniert nicht");
+                    }
                 } catch (JSONException e)
                 {
                     e.printStackTrace();
                 }
-
-                if (success == 1)
-                {
-                    // visitors found
-                    // Getting Array of Products
-                    geoCaches = json.getJSONArray(TAG_GEOCACHES);
-
-                    // looping through All Products
-                    for (int i = 0; i < geoCaches.length(); i++)
-                    {
-                        JSONObject c = geoCaches.getJSONObject(i);
-
-                        // Storing each json item in variable
-                        String id = c.getString(TAG_ID);
-                        String name = c.getString(TAG_NAME);
-                        double latitude = c.getDouble(TAG_LATITUDE);
-                        double longitude = c.getDouble(TAG_LONGITUDE);
-                        GeoCacheProvider.CreateGeoCache(name, id, latitude, longitude);
-                    }
-                }
-                else
-                {
-                    // no visitors found
-                    // Launch Add New product Activity
-                    //   Intent i = new Intent(getApplicationContext(),
-                    //           NewProductActivity.class);
-                    //   // Closing all previous activities
-                    //   i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    //   startActivity(i);
-                    Log.i("GET", "funktioniert nicht");
-                }
-            } catch (JSONException e)
-            {
-                e.printStackTrace();
             }
-
             return null;
         }
 

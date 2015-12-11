@@ -1,5 +1,7 @@
 package daimler.geocacheme.Server;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -13,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import daimler.geocacheme.MapsActivity;
+
 /**
  * Created by CGsch on 09.12.2015.
  */
@@ -22,19 +26,21 @@ public class GetGeoCacheVisitors
 
     // url to get all visitors list
     private static String url_all_visitors = "http://geocacheme.bplaced.net/return_visitors_of_geocache.php";
+    private ProgressDialog pDialog;
 
     // JSON Node names
     private static final String TAG_SUCCESS = "success";
     private static final String TAG_VISITORS = "visitors";
     private static final String TAG_NAME = "name";
-
+    public Context BaseContext;
     public String GeoCacheID = null;
     public List<String> VisitorList;
     // visitors JSONArray
     JSONArray visitors = null;
 
-    public List<String> StartGetGeoCacheVisitors(String geoCacheID) throws ExecutionException, InterruptedException
+    public List<String> StartGetGeoCacheVisitors(String geoCacheID, Context context) throws ExecutionException, InterruptedException
     {
+        BaseContext = context;
         GeoCacheID = geoCacheID;
         if (GeoCacheID != null)
         {
@@ -53,6 +59,12 @@ public class GetGeoCacheVisitors
         protected void onPreExecute()
         {
             super.onPreExecute();
+            super.onPreExecute();
+            pDialog = new ProgressDialog(BaseContext);
+            pDialog.setMessage("Loading products. Please wait...");
+            pDialog.setIndeterminate(false);
+            pDialog.setCancelable(false);
+            pDialog.show();
         }
 
         /**
@@ -69,54 +81,56 @@ public class GetGeoCacheVisitors
             // getting JSON string from URL
             JSONObject json = jParser.makeHttpRequest(url_all_visitors, "POST", params);
 
-            // Check your log cat for JSON reponse
-            Log.i("Visitors_found: ", "Response received");
-            try
+            if (json != null)
             {
-                // Checking for SUCCESS TAG
-                int success = 0;
+                // Check your log cat for JSON reponse
+                Log.i("Visitors_found: ", "Response received");
                 try
                 {
-                    success = json.getInt(TAG_SUCCESS);
+                    // Checking for SUCCESS TAG
+                    int success = 0;
+                    try
+                    {
+                        success = json.getInt(TAG_SUCCESS);
+                    } catch (JSONException e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                    if (success == 1)
+                    {
+                        Log.i("Visitors_found: ", "We found some Visitors");
+                        // visitors found
+                        // Getting Array of Products
+                        visitors = json.getJSONArray(TAG_VISITORS);
+                        VisitorList = new ArrayList<String>();
+                        // looping through All Products
+                        for (int i = 0; i < visitors.length(); i++)
+                        {
+                            JSONObject c = visitors.getJSONObject(i);
+
+                            // Storing each json item in variable
+                            String name = c.getString(TAG_NAME);
+                            Log.i("VisitorName", name);
+                            VisitorList.add(name);
+                        }
+                    }
+                    else
+                    {
+                        // no visitors found
+                        // Launch Add New product Activity
+                        //   Intent i = new Intent(getApplicationContext(),
+                        //           NewProductActivity.class);
+                        //   // Closing all previous activities
+                        //   i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        //   startActivity(i);
+                        Log.i("GETVISITORS", "funktioniert nicht");
+                    }
                 } catch (JSONException e)
                 {
                     e.printStackTrace();
                 }
-
-                if (success == 1)
-                {
-                    Log.i("Visitors_found: ", "We found some Visitors");
-                    // visitors found
-                    // Getting Array of Products
-                    visitors = json.getJSONArray(TAG_VISITORS);
-                    VisitorList = new ArrayList<String>();
-                    // looping through All Products
-                    for (int i = 0; i < visitors.length(); i++)
-                    {
-                        JSONObject c = visitors.getJSONObject(i);
-
-                        // Storing each json item in variable
-                        String name = c.getString(TAG_NAME);
-                        Log.i("VisitorName", name);
-                        VisitorList.add(name);
-                    }
-                }
-                else
-                {
-                    // no visitors found
-                    // Launch Add New product Activity
-                    //   Intent i = new Intent(getApplicationContext(),
-                    //           NewProductActivity.class);
-                    //   // Closing all previous activities
-                    //   i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    //   startActivity(i);
-                    Log.i("GETVISITORS", "funktioniert nicht");
-                }
-            } catch (JSONException e)
-            {
-                e.printStackTrace();
             }
-
             return null;
         }
 
@@ -126,7 +140,7 @@ public class GetGeoCacheVisitors
         protected void onPostExecute(String file_url)
         {
             // dismiss the dialog after getting all visitors
-
+            pDialog.dismiss();
         }
 
 

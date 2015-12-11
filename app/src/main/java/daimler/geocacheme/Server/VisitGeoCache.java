@@ -72,29 +72,30 @@ public class VisitGeoCache
             // Note that create product url accepts POST method
             JSONObject json = jsonParser.makeHttpRequest(url_create_geocache,
                     "POST", params);
-
-            // check log cat fro response
-            Log.d("Create Response", json.toString());
-
-            // check for success tag
-            try
+            if (json != null)
             {
-                int success = json.getInt(TAG_SUCCESS);
+                // check log cat fro response
+                Log.d("Create Response", json.toString());
 
-                if (success == 1)
+                // check for success tag
+                try
                 {
-                    // successfully created product
+                    int success = json.getInt(TAG_SUCCESS);
 
-                }
-                else
+                    if (success == 1)
+                    {
+                        // successfully created product
+
+                    }
+                    else
+                    {
+                        // failed to create product
+                    }
+                } catch (JSONException e)
                 {
-                    // failed to create product
+                    e.printStackTrace();
                 }
-            } catch (JSONException e)
-            {
-                e.printStackTrace();
             }
-
             return null;
         }
 
