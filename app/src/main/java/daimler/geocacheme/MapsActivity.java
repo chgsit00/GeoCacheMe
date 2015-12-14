@@ -1,6 +1,7 @@
 package daimler.geocacheme;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.IntentSender;
 import android.location.Address;
@@ -14,10 +15,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,16 +35,21 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 
 import daimler.geocacheme.GeoCacheLogic.GeoCache;
 import daimler.geocacheme.GeoCacheLogic.GeoCacheProvider;
 import daimler.geocacheme.InternetConnection.InternetConnectionTester;
-import daimler.geocacheme.Server.GetGeoCacheVisitors;
+import daimler.geocacheme.Server.JSONParser;
 import daimler.geocacheme.UserManagement.UserManagement;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
@@ -65,6 +69,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public List<Marker> Markers;
     private Marker myLocationMarker;
     private static BitmapDescriptor markerIconBitmapDescriptor;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -412,7 +417,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }
         final String text = geoCacheID;
-        final GetGeoCacheVisitors getGeoCacheVisitors = new GetGeoCacheVisitors();
         ImageButton userButton = (ImageButton) findViewById(R.id.showusers);
         View.OnClickListener onClickListener = new View.OnClickListener()
         {
@@ -421,40 +425,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v)
             {
                 Log.i("GetGeoCacheVisitors", "Hier");
-                AlertDialog.Builder exitBuilder = new AlertDialog.Builder(MapsActivity.this);
-                View visitorsView = (LayoutInflater.from(MapsActivity.this)).inflate(R.layout.visitors_window, null);
-                TextView list = (TextView) visitorsView.findViewById(R.id.list);
-                exitBuilder.setView(visitorsView);
-                exitBuilder.setCancelable(true);
-                exitBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener()
-                {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which)
-                    {
-                        dialog.dismiss();
-                        dialog.cancel();
-                    }
-                });
                 try
                 {
-                    List<String> visitors = getGeoCacheVisitors.StartGetGeoCacheVisitors(text, MapsActivity.this);
-                    if (visitors != null)
-                    {
-                        for (String visitor : visitors)
-                        {
-                            list.append("\n" + visitor);
-                        }
-                    }
-                    else
-                    {
-                        list.append("No visitors found");
-                    }
-
-                } catch (InterruptedException | ExecutionException e)
+                    GetAllVisitorsTask getAllVisitorsTask = new GetAllVisitorsTask();
+                    getAllVisitorsTask.GeoCacheID = text;
+                    getAllVisitorsTask.execute();
+                } catch (Exception e)
                 {
-                    list.append("Server Connection Error");
+                    // list.append("Server Connection Error");
                 }
-                exitBuilder.show();
             }
         };
         if (geoCacheID != null)
@@ -464,8 +443,153 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return false;
     }
 
+    class GetAllVisitorsTask extends AsyncTask<String, String, String>
+    {
+        private ProgressDialog pDialog;
+        JSONParser jParser = new JSONParser();
+        // url to get all visitors list
+        private String url_all_visitors = "http://geocacheme.bplaced.net/return_visitors_of_geocache.php";
+        // JSON Node names
+        private static final String TAG_SUCCESS = "success";
+        private static final String TAG_VISITORS = "visitors";
+        private static final String TAG_NAME = "name";
+        public String GeoCacheID = null;
+        public List<String> VisitorList;
+        // visitors JSONArray
+        JSONArray visitors = null;
+
+        /**
+         * Before starting background thread Show Progress Dialog
+         */
+        @Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(MapsActivity.this);
+            pDialog.setMessage("Loading visitors. Please wait...");
+            pDialog.setIndeterminate(false);
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        /**
+         * getting All visitors from url
+         */
+        protected String doInBackground(String... args)
+        {
+            VisitorList = new ArrayList<>();
+            String id = GeoCacheID;
+            // Building Parameters
+            Log.i("Visitors_found: ", "Task started");
+            List<NameValuePair> params = new ArrayList<NameValuePair>();
+            params.add(new BasicNameValuePair("ID", id));
+
+            // getting JSON string from URL
+            JSONObject json = jParser.makeHttpRequest(url_all_visitors, "POST", params);
+
+            if (json != null)
+            {
+                // Check your log cat for JSON reponse
+                Log.i("Visitors_found: ", "Response received");
+                try
+                {
+                    // Checking for SUCCESS TAG
+                    int success = 0;
+                    try
+                    {
+                        success = json.getInt(TAG_SUCCESS);
+                    } catch (JSONException e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                    if (success == 1)
+                    {
+                        Log.i("Visitors_found: ", "We found some Visitors");
+                        // visitors found
+                        // Getting Array of Products
+                        visitors = json.getJSONArray(TAG_VISITORS);
+                        // looping through All Products
+                        for (int i = 0; i < visitors.length(); i++)
+                        {
+                            JSONObject c = visitors.getJSONObject(i);
+
+                            // Storing each json item in variable
+                            String name = c.getString(TAG_NAME);
+                            Log.i("VisitorName", name);
+                            VisitorList.add(name);
+                        }
+                    }
+                    else
+                    {
+                        Log.i("GETVISITORS", "funktioniert nicht");
+                    }
+                } catch (JSONException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
+
+        /**
+         * After completing background task Dismiss the progress dialog
+         **/
+        protected void onPostExecute(String file_url)
+        {
+            // dismiss the dialog after getting all visitors
+            AlertDialog.Builder exitBuilder = new AlertDialog.Builder(MapsActivity.this);
+            View visitorsView = (LayoutInflater.from(MapsActivity.this)).inflate(R.layout.visitors_window, null);
+            TextView list = (TextView) visitorsView.findViewById(R.id.list);
+            exitBuilder.setView(visitorsView);
+            exitBuilder.setCancelable(true);
+            exitBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    dialog.dismiss();
+                    dialog.cancel();
+                }
+            });
+            pDialog.dismiss();
+            List<String> visitors = VisitorList;// = getGeoCacheVisitors.StartGetGeoCacheVisitors(text, MapsActivity.this);
+            if (visitors != null)
+            {
+                if (!visitors.isEmpty())
+                {
+                    for (String visitor : visitors)
+                    {
+                        list.append("\n" + visitor);
+                    }
+                }
+                else
+                {
+                    list.append("No visitors found");
+                }
+            }
+            else
+            {
+                list.append("No visitors found");
+            }
+            exitBuilder.show();
+        }
+    }
+
     private class GeocoderTask extends AsyncTask<String, Void, List<Address>>
     {
+        private ProgressDialog pDialog;
+
+        @Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(MapsActivity.this);
+            pDialog.setMessage("Searching. Please wait...");
+            pDialog.setIndeterminate(false);
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
 
         @Override
         protected List<Address> doInBackground(String... locationName)
@@ -515,6 +639,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 mMap.addMarker(markerOptions);
                 PlaceGeoCacheMarkers();
+                pDialog.dismiss();
                 // Locate the first location
                 if (i == 0)
                     mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
