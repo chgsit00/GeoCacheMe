@@ -20,6 +20,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -137,16 +138,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void GeoCache_Setup()
     {
-        //TODO: Noch statisch zum Testen
-        //    String id = UUID.randomUUID().toString();
-        //    GeoCacheProvider.CreateGeoCache("Berlin", id, 52.520007, 13.404953999999975);
-//
-        //    id = UUID.randomUUID().toString();
-        //    GeoCacheProvider.CreateGeoCache("Hochschule Esslingen", id, 48.7453375, 9.322090099999969);
-//
-        //    id = UUID.randomUUID().toString();
-        //    GeoCacheProvider.CreateGeoCache("Mensa Hochschule Esslingen", id, 48.74438725435462, 9.32416534420554);
-
+        ImageButton showVisitorsButton = (ImageButton) findViewById(R.id.showusers);
+        showVisitorsButton.setVisibility(View.INVISIBLE);
         PlaceGeoCacheMarkers();
         mMap.setOnMapLongClickListener(this);
         MarkerAdder.run();
@@ -360,6 +353,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapLongClick(LatLng point)
     {
+        ImageButton showVisitorsButton = (ImageButton) findViewById(R.id.showusers);
+        showVisitorsButton.setVisibility(View.INVISIBLE);
         View view = (LayoutInflater.from(MapsActivity.this)).inflate(R.layout.geocache_dialog, null);
         AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
         builder.setView(view);
@@ -438,7 +433,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         };
         if (geoCacheID != null)
         {
+            userButton.setVisibility(View.VISIBLE);
             userButton.setOnClickListener(onClickListener);
+        }
+        else
+        {
+            userButton.setVisibility(View.INVISIBLE);
         }
         return false;
     }
@@ -548,12 +548,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 @Override
                 public void onClick(DialogInterface dialog, int which)
                 {
+                    ImageButton showVisitorsButton = (ImageButton) findViewById(R.id.showusers);
+                    showVisitorsButton.setVisibility(View.INVISIBLE);
                     dialog.dismiss();
                     dialog.cancel();
                 }
             });
             pDialog.dismiss();
-            List<String> visitors = VisitorList;// = getGeoCacheVisitors.StartGetGeoCacheVisitors(text, MapsActivity.this);
+            List<String> visitors = VisitorList;
             if (visitors != null)
             {
                 if (!visitors.isEmpty())

@@ -8,7 +8,6 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.security.Provider;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -136,8 +136,14 @@ public class MainActivity extends AppCompatActivity
             builder.show();
         }
 
-        Thread t = new Thread(GeoCacheServerProviderRunnable);
-        t.start();
+        Thread GeoCacheServerProviderThread = new Thread(GeoCacheServerProviderRunnable);
+        Thread saveGeoCacheThread = new Thread(saveGeoCacheRunnable);
+        Thread userServerProviderThread = new Thread(userServerProviderRunnable);
+        Thread visitGeoCacheThread = new Thread(visitGeoCacheRunnable);
+        GeoCacheServerProviderThread.start();
+        saveGeoCacheThread.start();
+        userServerProviderThread.start();
+        visitGeoCacheThread.start();
     }
 
     class CheckInternetConnectionTask extends AsyncTask<String, Void, String>
@@ -164,8 +170,82 @@ public class MainActivity extends AppCompatActivity
     public Runnable GeoCacheServerProviderRunnable = new Runnable()
     {
         public Handler handler = new Handler();
+
+        @Override
+        public void run()
+        {
+            new CheckInternetConnectionTask().execute();
+            if (internetCheck)
+            {
+                try
+                {
+                    geoCacheServerProvider.StartGeoCacheServerProvider();
+                } catch (Exception e)
+                {
+                    handler.postDelayed(GeoCacheServerProviderRunnable, 1000);
+                }
+                GeoCacheProvider.saveGeoCacheListIntoPrefs(MainActivity.this);
+            }
+            handler.postDelayed(GeoCacheServerProviderRunnable, 1000);
+        }
+    };
+
+    public Runnable saveGeoCacheRunnable = new Runnable()
+    {
+        public Handler handler = new Handler();
         final SaveGeoCache saveGeoCache = new SaveGeoCache();
+
+        @Override
+        public void run()
+        {
+            User Owner = UserManagement.getUserFromPrefs(MainActivity.this);
+            new CheckInternetConnectionTask().execute();
+            if (internetCheck)
+            {
+                try
+                {
+                    if (Owner != null)
+                    {
+                        saveGeoCache.StartSaveGeoCache(Owner.ID);
+                    }
+                } catch (Exception e)
+                {
+                    handler.postDelayed(saveGeoCacheRunnable, 1000);
+                }
+            }
+            handler.postDelayed(saveGeoCacheRunnable, 1000);
+        }
+    };
+
+    public Runnable userServerProviderRunnable = new Runnable()
+    {
+        public Handler handler = new Handler();
         final UserServerProvider userServerProvider = new UserServerProvider();
+        @Override
+        public void run()
+        {
+            User Owner = UserManagement.getUserFromPrefs(MainActivity.this);
+            new CheckInternetConnectionTask().execute();
+            if (internetCheck)
+            {
+                try
+                {
+                    if (Owner != null)
+                    {
+                        userServerProvider.StartUserServerProvider(Owner.Name, Owner.ID);
+                    }
+                } catch (Exception e)
+                {
+                    handler.postDelayed(userServerProviderRunnable, 1000);
+                }
+            }
+            handler.postDelayed(userServerProviderRunnable, 1000);
+        }
+    };
+
+    public Runnable visitGeoCacheRunnable = new Runnable()
+    {
+        public Handler handler = new Handler();
         final VisitGeoCache visitGeoCache = new VisitGeoCache();
 
         @Override
@@ -177,21 +257,16 @@ public class MainActivity extends AppCompatActivity
             {
                 try
                 {
-                    geoCacheServerProvider.StartGeoCacheServerProvider();
                     if (Owner != null)
                     {
-                        saveGeoCache.StartSaveGeoCache(Owner.ID);
-                        userServerProvider.StartUserServerProvider(Owner.Name, Owner.ID);
                         visitGeoCache.StartVisitGeoCache(Owner.ID);
                     }
                 } catch (Exception e)
                 {
-                    handler.postDelayed(GeoCacheServerProviderRunnable, 1000);
+                    handler.postDelayed(visitGeoCacheRunnable, 1000);
                 }
-                GeoCacheProvider.saveGeoCacheListIntoPrefs(MainActivity.this);
             }
-            handler.postDelayed(GeoCacheServerProviderRunnable, 1000);
+            handler.postDelayed(visitGeoCacheRunnable, 1000);
         }
     };
-
 }
