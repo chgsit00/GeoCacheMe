@@ -203,7 +203,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         distance = CalculateDistance(currentLatitude, currentLongitude, geoCache.Latitude, geoCache.Longitude);
                         if (distance < 100 && geoCache.MarkerID != null)
                         {
-                            setMarkerAsVisited(geoCache.MarkerID, geoCache.Visited);
+                            setMarkerAsVisited(geoCache.MarkerID, geoCache.Visited, geoCache.Name);
                             geoCache.Visited = true;
                             GeoCacheProvider.saveGeoCacheListIntoPrefs(MapsActivity.this);
                         }
@@ -231,13 +231,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return dist;
     }
 
-    public void setMarkerAsVisited(String geoCacheID, boolean visited)
+    public void setMarkerAsVisited(String geoCacheID, boolean visited, String geoCacheName)
     {
         for (Marker marker : Markers)
         {
             if (marker.getId().equals(geoCacheID) && !visited)
             {
                 marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.gruen_logo_72));
+                Toast.makeText(getBaseContext(), geoCacheName+" visited", Toast.LENGTH_SHORT).show();
             }
         }
     }

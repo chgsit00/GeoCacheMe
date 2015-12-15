@@ -37,7 +37,7 @@ public class SaveGeoCache
                 GeoCacheID = geoCache.Id;
                 GeoCacheLatitude = geoCache.Latitude;
                 GeoCacheLongitude = geoCache.Longitude;
-                //  GeoCacheOwnerID = geoCache.OwnerID;
+                GeoCacheOwnerID = geoCache.OwnerID;
                 new SaveGeoCacheTask().execute();
             }
         }
@@ -70,14 +70,14 @@ public class SaveGeoCache
             String id = GeoCacheID;
             double gpsLatitude = GeoCacheLatitude;
             double gpsLongitude = GeoCacheLongitude;
-
+            String ownerId = GeoCacheOwnerID;
             // Building Parameters
             List<NameValuePair> params = new ArrayList<NameValuePair>();
             params.add(new BasicNameValuePair("name", name));
             params.add(new BasicNameValuePair("id", id));
             params.add(new BasicNameValuePair("gpsLatitude", "" + gpsLatitude));
             params.add(new BasicNameValuePair("gpsLongitude", "" + gpsLongitude));
-
+            params.add(new BasicNameValuePair("owner_id", ownerId));
             // getting JSON Object
             // Note that create product url accepts POST method
             JSONObject json = jsonParser.makeHttpRequest(url_create_geocache,
@@ -115,6 +115,7 @@ public class SaveGeoCache
         protected void onPostExecute(String file_url)
         {
             // dismiss the dialog once done
+            super.onPostExecute(file_url);
         }
     }
 }

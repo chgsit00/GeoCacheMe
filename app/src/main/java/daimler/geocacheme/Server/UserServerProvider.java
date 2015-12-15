@@ -92,6 +92,7 @@ public class UserServerProvider
         protected void onPostExecute(String file_url)
         {
             // dismiss the dialog once done
+            super.onPostExecute(file_url);
         }
     }
 }

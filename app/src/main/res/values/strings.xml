@@ -14,4 +14,7 @@
     <string name="title_activity_user_management">UserManagementActivity</string>
     <string name="usernametext">Name</string>
     <string name="exitstring">Close GeoCacheme! ?</string>
+    <string name="ChangeUserNameButtonText">Change UserName</string>
+    <string name="VisitCount">Number of foreign visited GeoCaches</string>
+    <string name="ShowUserID">User ID</string>
 </resources>

@@ -19,21 +19,24 @@ import daimler.geocacheme.GeoCacheLogic.GeoCacheProvider;
  */
 public class VisitGeoCache
 {
-    private static String url_create_geocache = "http://geocacheme.bplaced.net/geovisit.php";
+    private final static String url_visit_geocache = "http://geocacheme.bplaced.net/geovisit.php";
     public String UserID;
     public String GeoCacheID;
+    public ArrayList<String> visitedInfo;
 
     public void StartVisitGeoCache(String userID)
     {
+        visitedInfo = new ArrayList<>();
         UserID = userID;
         for (GeoCache geoCache : GeoCacheProvider.GetGeoCacheList())
         {
             if (geoCache.Visited)
             {
                 GeoCacheID = geoCache.Id;
-                new VisitGeoCacheTask().execute();
+                visitedInfo.add(GeoCacheID + ";" + UserID);
             }
         }
+        new VisitGeoCacheTask().execute();
     }
 
     class VisitGeoCacheTask extends AsyncTask<String, String, String>
@@ -64,12 +67,24 @@ public class VisitGeoCache
 
             // Building Parameters
             List<NameValuePair> params = new ArrayList<NameValuePair>();
-            params.add(new BasicNameValuePair("G_ID", geoCacheID));
-            params.add(new BasicNameValuePair("V_ID", userID));
+            //   params.add(new BasicNameValuePair("G_ID", geoCacheID));
+            //   params.add(new BasicNameValuePair("V_ID", userID));
 
+            String[] VisitArray = new String[visitedInfo.size()];
+            int count = 0;
+            for (String visit : visitedInfo)
+            {
+                VisitArray[count] = visit;
+                count++;
+            }
+            for (int i = 0; i < VisitArray.length; i++)
+            {
+                params.add(new BasicNameValuePair("Visit" + i, VisitArray[i]));
+            }
+            params.add(new BasicNameValuePair("ArrayLength", ""+count));
             // getting JSON Object
             // Note that create product url accepts POST method
-            JSONObject json = jsonParser.makeHttpRequest(url_create_geocache,
+            JSONObject json = jsonParser.makeHttpRequest(url_visit_geocache,
                     "POST", params);
             if (json != null)
             {
@@ -103,6 +118,7 @@ public class VisitGeoCache
          **/
         protected void onPostExecute(String file_url)
         {
+            super.onPostExecute(file_url);
             // dismiss the dialog once done
         }
     }

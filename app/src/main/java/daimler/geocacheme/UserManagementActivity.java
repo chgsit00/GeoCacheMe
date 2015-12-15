@@ -16,6 +16,8 @@ import android.widget.TextView;
 
 import java.util.UUID;
 
+import daimler.geocacheme.GeoCacheLogic.GeoCache;
+import daimler.geocacheme.GeoCacheLogic.GeoCacheProvider;
 import daimler.geocacheme.UserManagement.User;
 import daimler.geocacheme.UserManagement.UserManagement;
 
@@ -34,6 +36,12 @@ public class UserManagementActivity extends AppCompatActivity
 
         userNameView.setText(UserManagement.getUserFromPrefs(UserManagementActivity.this).Name);
 
+        TextView visitedGeoCachesView = (TextView) findViewById(R.id.geocachesvisited);
+
+        String userId = UserManagement.getUserFromPrefs(UserManagementActivity.this).ID;
+        int visited = CountVisitedGeoCaches(userId);
+        visitedGeoCachesView.setText(""+visited);
+
         TextView userIdView = (TextView) findViewById(R.id.userid);
 
         userIdView.setText(UserManagement.getUserFromPrefs(UserManagementActivity.this).ID);
@@ -45,7 +53,7 @@ public class UserManagementActivity extends AppCompatActivity
             public void onClick(View v)
             {
                 // Getting reference to EditText to get the user input location
-            ChangeUserName();
+                ChangeUserName();
             }
         };
 
@@ -75,5 +83,18 @@ public class UserManagementActivity extends AppCompatActivity
             }
         });
         builder.show();
+    }
+
+    public static int CountVisitedGeoCaches(String userID)
+    {
+        int count = 0;
+        for (GeoCache geoCache : GeoCacheProvider.GetGeoCacheList())
+        {
+            if (geoCache.Visited && !userID.equals(geoCache.OwnerID))
+            {
+                count++;
+            }
+        }
+        return count;
     }
 }

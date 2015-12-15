@@ -28,7 +28,7 @@ public class GeoCacheProvider
         }
     }
 
-    public static void CreateGeoCache(String name, String iD, double latitude, double longitude)
+    public static void CreateGeoCache(String name, String iD, double latitude, double longitude, String ownerID)
     {
         if (!GeoCacheProvider.GeoCacheAlreadyExists(iD))
         {
@@ -38,6 +38,7 @@ public class GeoCacheProvider
             geoCache.Latitude = latitude;
             geoCache.Longitude = longitude;
             geoCache.Visited = false;
+            geoCache.OwnerID = ownerID;
             GeoCacheList.add(geoCache);
         }
     }

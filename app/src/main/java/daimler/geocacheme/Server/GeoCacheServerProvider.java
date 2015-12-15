@@ -31,6 +31,7 @@ public class GeoCacheServerProvider
     private static final String TAG_NAME = "name";
     private static final String TAG_LATITUDE = "gpsLatitude";
     private static final String TAG_LONGITUDE = "gpsLongitude";
+    private static final String TAG_OWNER = "owner_id";
 
     // visitors JSONArray
     JSONArray geoCaches = null;
@@ -98,7 +99,8 @@ public class GeoCacheServerProvider
                             String name = c.getString(TAG_NAME);
                             double latitude = c.getDouble(TAG_LATITUDE);
                             double longitude = c.getDouble(TAG_LONGITUDE);
-                            GeoCacheProvider.CreateGeoCache(name, id, latitude, longitude);
+                            String ownerID = c.getString(TAG_OWNER);
+                            GeoCacheProvider.CreateGeoCache(name, id, latitude, longitude, ownerID);
                         }
                     }
                     else
@@ -126,7 +128,7 @@ public class GeoCacheServerProvider
         protected void onPostExecute(String file_url)
         {
             // dismiss the dialog after getting all visitors
-
+            super.onPostExecute(file_url);
         }
     }
 }
