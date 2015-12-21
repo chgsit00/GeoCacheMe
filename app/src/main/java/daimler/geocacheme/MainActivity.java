@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setView(view);
         final EditText userInput = (EditText) view.findViewById(R.id.userinput);
-
+        builder.setTitle("Start App");
         builder.setCancelable(false).setPositiveButton("Ok", new DialogInterface.OnClickListener()
         {
             @Override

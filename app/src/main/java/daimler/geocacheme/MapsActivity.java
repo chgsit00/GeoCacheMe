@@ -539,12 +539,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         protected void onPostExecute(String file_url)
         {
             // dismiss the dialog after getting all visitors
-            AlertDialog.Builder exitBuilder = new AlertDialog.Builder(MapsActivity.this);
+            AlertDialog.Builder visitorBuilder = new AlertDialog.Builder(MapsActivity.this);
             View visitorsView = (LayoutInflater.from(MapsActivity.this)).inflate(R.layout.visitors_window, null);
             TextView list = (TextView) visitorsView.findViewById(R.id.list);
-            exitBuilder.setView(visitorsView);
-            exitBuilder.setCancelable(true);
-            exitBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener()
+            visitorBuilder.setView(visitorsView);
+            visitorBuilder.setCancelable(true);
+            visitorBuilder.setTitle("Visitors");
+            visitorBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener()
             {
                 @Override
                 public void onClick(DialogInterface dialog, int which)
@@ -575,7 +576,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             {
                 list.append("No visitors found");
             }
-            exitBuilder.show();
+            visitorBuilder.show();
         }
     }
 
