@@ -42,9 +42,8 @@ public class UserManagementActivity extends AppCompatActivity
         int visited = CountVisitedGeoCaches(userId);
         visitedGeoCachesView.setText(""+visited);
 
-        TextView userIdView = (TextView) findViewById(R.id.userid);
-
-        userIdView.setText(UserManagement.getUserFromPrefs(UserManagementActivity.this).ID);
+     //   TextView userIdView = (TextView) findViewById(R.id.userid);
+     //   userIdView.setText(UserManagement.getUserFromPrefs(UserManagementActivity.this).ID);
 
         Button changeUserNameButton = (Button) findViewById(R.id.usernamebutton);
         View.OnClickListener findClickListener = new View.OnClickListener()
@@ -56,7 +55,6 @@ public class UserManagementActivity extends AppCompatActivity
                 ChangeUserName();
             }
         };
-
         // Setting button click event listener for the find button
         changeUserNameButton.setOnClickListener(findClickListener);
     }

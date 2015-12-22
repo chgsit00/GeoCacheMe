@@ -17,4 +17,5 @@
     <string name="ChangeUserNameButtonText">Change UserName</string>
     <string name="VisitCount">Number of foreign visited GeoCaches</string>
     <string name="ShowUserID">User ID</string>
+    <string name="userprofilelabel">User Profile</string>
 </resources>

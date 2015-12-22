@@ -60,36 +60,6 @@
         />
 
     <TextView
-        android:id="@+id/userid"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/usernamebutton"
-        android:layout_marginTop="33dp"
-        android:gravity="right"
-        android:text="Large Text"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:layout_toRightOf="@+id/textView4"
-        android:layout_toEndOf="@+id/textView4"
-        android:textColor="#6a9bff"/>
-
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView2"
-        android:layout_alignStart="@+id/textView2"
-        android:layout_alignTop="@+id/userid"
-        android:background="#5e80ff"
-        android:gravity="left"
-        android:text="@string/ShowUserID"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="#ffffff"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp"/>
-
-    <TextView
         android:id="@+id/geocachesvisited"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -97,8 +67,8 @@
         android:text="Large Text"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="#6a9bff"
-        android:layout_marginTop="117dp"
-        android:layout_below="@+id/userid"
+        android:layout_marginTop="60dp"
+        android:layout_below="@+id/usernamebutton"
         android:layout_alignRight="@+id/usernamebutton"
         android:layout_alignEnd="@+id/usernamebutton"/>
 
@@ -114,7 +84,9 @@
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
         android:layout_alignTop="@+id/geocachesvisited"
+        android:layout_alignLeft="@+id/textView2"
+        android:layout_alignStart="@+id/textView2"
         android:layout_toLeftOf="@+id/usernamebutton"
-        android:layout_alignLeft="@+id/textView4"
-        android:layout_alignStart="@+id/textView4"/>
+        android:layout_toStartOf="@+id/usernamebutton"/>
+
 </RelativeLayout>
