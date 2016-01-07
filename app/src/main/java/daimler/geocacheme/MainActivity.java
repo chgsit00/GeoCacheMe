@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity
 
         ImageButton optionsButton = (ImageButton) findViewById(R.id.optionsbutton);
 
-        optionsButton.setImageResource(R.drawable.optionsmenu);
+      //  optionsButton.setImageResource(R.drawable.optionsmenu);
 
         ImageButton exitButton = (ImageButton) findViewById(R.id.exitbutton);
         exitButton.setImageResource(R.drawable.xicon);
